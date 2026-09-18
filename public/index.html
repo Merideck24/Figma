@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ClaudeEO — AI Marketing Ops</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    color-scheme: light dark;
+    --accent: #6d5ef0;
+    --accent-text: #ffffff;
+    --border: color-mix(in srgb, currentColor 15%, transparent);
+    --surface: color-mix(in srgb, currentColor 4%, transparent);
+    --muted: color-mix(in srgb, currentColor 55%, transparent);
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    max-width: 920px;
+    margin: 2.5rem auto;
+    padding: 0 1.25rem 3rem;
+    line-height: 1.5;
+  }
+  h1 { margin-bottom: 0; font-size: 1.9rem; letter-spacing: -0.02em; }
+  .subtitle { color: var(--muted); margin-top: 0.3rem; font-size: 0.95rem; }
+  #mode { font-weight: 600; }
+  section {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem 1.5rem;
+    margin: 1.5rem 0;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  h2 {
+    margin-top: 0;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+  }
+  label { display: block; margin: 0.7rem 0 0.25rem; font-size: 0.85rem; color: var(--muted); }
+  input, textarea, select {
+    width: 100%;
+    padding: 0.5rem 0.6rem;
+    font: inherit;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+  }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  button {
+    margin-top: 1rem;
+    margin-right: 0.5rem;
+    padding: 0.55rem 1.1rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--accent-text);
+    font: inherit;
+    font-weight: 600;
+  }
+  button:hover { filter: brightness(1.08); }
+  button.secondary { background: transparent; color: inherit; border: 1px solid var(--border); }
+  pre {
+    white-space: pre-wrap;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.85rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    min-height: 1.2em;
+  }
+  #contactsList { font-size: 0.9rem; margin-top: 0.75rem; }
+  #contactsList ul { padding-left: 1.1rem; margin: 0; }
+  #contactsList code { font-size: 0.8rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<h1>ClaudeEO</h1>
+<p class="subtitle">Auto CRM · WhatsApp Agent Kit · Claude Ads · Combo Marketing — <span id="mode">checking mode…</span></p>
+
+<section>
+  <h2>Auto CRM — Contacts</h2>
+  <label>Name</label><input id="c-name" placeholder="Jane Doe" />
+  <label>Phone</label><input id="c-phone" placeholder="+1 555 0100" />
+  <label>Email</label><input id="c-email" placeholder="jane@example.com" />
+  <label>Stage</label>
+  <select id="c-stage">
+    <option value="lead">lead</option>
+    <option value="qualified">qualified</option>
+    <option value="customer">customer</option>
+    <option value="lost">lost</option>
+  </select>
+  <button onclick="createContact()">Add contact</button>
+  <button class="secondary" onclick="loadContacts()">Refresh list</button>
+  <div id="contactsList"></div>
+</section>
+
+<section>
+  <h2>WhatsApp Agent Kit</h2>
+  <label>Contact ID</label><input id="w-contact" placeholder="paste contact id from list above" />
+  <label>Incoming message</label><textarea id="w-message" rows="2" placeholder="Hi, do you still have this in stock?"></textarea>
+  <button onclick="draftReply()">Draft reply</button>
+  <pre id="w-output"></pre>
+</section>
+
+<section>
+  <h2>Claude Ads</h2>
+  <label>Product</label><input id="a-product" placeholder="Wireless earbuds" />
+  <label>Audience</label><input id="a-audience" placeholder="Runners aged 20-35" />
+  <label>Platform</label>
+  <select id="a-platform">
+    <option>facebook</option><option>instagram</option><option>google</option><option>tiktok</option>
+  </select>
+  <button onclick="generateAds()">Generate ad copy</button>
+  <pre id="a-output"></pre>
+</section>
+
+<section>
+  <h2>Combo Marketing</h2>
+  <label>Goal</label><input id="m-goal" placeholder="Re-engage cold leads before month end" />
+  <label>Audience</label><input id="m-audience" placeholder="Leads inactive for 30+ days" />
+  <label>Stage filter (optional)</label>
+  <select id="m-stage">
+    <option value="">all</option>
+    <option value="lead">lead</option>
+    <option value="qualified">qualified</option>
+    <option value="customer">customer</option>
+    <option value="lost">lost</option>
+  </select>
+  <button onclick="generateCombo()">Generate campaign plan</button>
+  <pre id="m-output"></pre>
+</section>
+
+<script>
+async function api(path, opts) {
+  const res = await fetch(path, opts);
+  if (!res.ok) throw new Error((await res.json()).error || res.statusText);
+  return res.status === 204 ? null : res.json();
+}
+
+async function loadMode() {
+  const h = await api('/api/health');
+  document.getElementById('mode').textContent = 'Claude mode: ' + h.claudeMode;
+}
+
+async function loadContacts() {
+  const contacts = await api('/api/contacts');
+  document.getElementById('contactsList').innerHTML = contacts.length
+    ? '<ul>' + contacts.map(c => `<li><code>${c.id}</code> — ${c.name} (${c.stage})</li>`).join('') + '</ul>'
+    : '<p>No contacts yet.</p>';
+}
+
+async function createContact() {
+  await api('/api/contacts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: document.getElementById('c-name').value,
+      phone: document.getElementById('c-phone').value,
+      email: document.getElementById('c-email').value,
+      stage: document.getElementById('c-stage').value,
+    }),
+  });
+  loadContacts();
+}
+
+async function draftReply() {
+  const out = document.getElementById('w-output');
+  out.textContent = 'Thinking…';
+  try {
+    const r = await api('/api/skills/whatsapp-reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contactId: document.getElementById('w-contact').value,
+        message: document.getElementById('w-message').value,
+      }),
+    });
+    out.textContent = r.reply;
+  } catch (e) { out.textContent = 'Error: ' + e.message; }
+}
+
+async function generateAds() {
+  const out = document.getElementById('a-output');
+  out.textContent = 'Thinking…';
+  try {
+    const r = await api('/api/skills/ad-copy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        product: document.getElementById('a-product').value,
+        audience: document.getElementById('a-audience').value,
+        platform: document.getElementById('a-platform').value,
+      }),
+    });
+    out.textContent = r.copy;
+  } catch (e) { out.textContent = 'Error: ' + e.message; }
+}
+
+async function generateCombo() {
+  const out = document.getElementById('m-output');
+  out.textContent = 'Thinking…';
+  try {
+    const r = await api('/api/skills/combo-campaign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        goal: document.getElementById('m-goal').value,
+        audience: document.getElementById('m-audience').value,
+        stageFilter: document.getElementById('m-stage').value || undefined,
+      }),
+    });
+    out.textContent = `Segment size: ${r.segmentSize}\n\n${r.plan}`;
+  } catch (e) { out.textContent = 'Error: ' + e.message; }
+}
+
+loadMode();
+loadContacts();
+</script>
+</body>
+</html>
