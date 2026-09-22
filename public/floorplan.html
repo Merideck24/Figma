@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>SBC Summit 2026 — Floor Plan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E📍%3C/text%3E%3C/svg%3E" />
+<style>
+  :root {
+    color-scheme: light dark;
+    --accent: #6d5ef0;
+    --accent-text: #ffffff;
+    --route: #ef6d4f;
+    --border: color-mix(in srgb, currentColor 15%, transparent);
+    --surface: color-mix(in srgb, currentColor 4%, transparent);
+    --hall: color-mix(in srgb, currentColor 6%, transparent);
+    --stand: color-mix(in srgb, var(--accent) 22%, transparent);
+    --muted: color-mix(in srgb, currentColor 55%, transparent);
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    max-width: 1080px;
+    margin: 2rem auto;
+    padding: 0 1rem 3rem;
+    line-height: 1.5;
+  }
+  h1 { margin-bottom: 0; font-size: 1.7rem; letter-spacing: -0.02em; }
+  .subtitle { color: var(--muted); margin-top: 0.3rem; font-size: 0.9rem; }
+  .subtitle a { color: inherit; }
+  .layout { display: grid; grid-template-columns: 1fr 340px; gap: 1rem; margin-top: 1.25rem; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+  section {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 1rem 1.15rem 1.25rem;
+  }
+  h2 {
+    margin: 0 0 0.6rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+  }
+  input {
+    width: 100%;
+    padding: 0.55rem 0.65rem;
+    font: inherit;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+  }
+  input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  button {
+    padding: 0.55rem 1rem;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    background: var(--accent);
+    color: var(--accent-text);
+    font: inherit;
+    font-weight: 600;
+  }
+  button:hover { filter: brightness(1.08); }
+  button.secondary { background: transparent; color: inherit; border: 1px solid var(--border); font-weight: 500; }
+  button[disabled] { opacity: 0.5; cursor: default; filter: none; }
+
+  svg { width: 100%; height: auto; display: block; touch-action: manipulation; }
+  .building { fill: none; stroke: var(--border); stroke-width: 3; stroke-dasharray: 10 6; }
+  .building-label { font-size: 15px; fill: var(--muted); }
+  .hall { fill: var(--hall); stroke: var(--border); stroke-width: 2; rx: 6; }
+  .hall-label { font-size: 16px; font-weight: 600; fill: var(--muted); }
+  .corridor { stroke: var(--border); stroke-width: 10; stroke-linecap: round; }
+  .stand { fill: var(--stand); stroke: color-mix(in srgb, var(--accent) 60%, transparent); stroke-width: 1.5; rx: 4; cursor: pointer; }
+  .stand:hover { fill: color-mix(in srgb, var(--accent) 38%, transparent); }
+  .stand.selected { fill: var(--accent); stroke: var(--accent); }
+  .stand.dimmed, .stand-label.dimmed { opacity: 0.22; }
+  .stand-label { font-size: 13px; font-weight: 600; fill: currentColor; pointer-events: none; }
+  .stand-label.selected { fill: var(--accent-text); }
+  .entrance { fill: color-mix(in srgb, currentColor 45%, transparent); }
+  .entrance-label { font-size: 12px; fill: var(--muted); }
+  .route-line { fill: none; stroke: var(--route); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 14 10; }
+  .route-start { fill: var(--route); }
+  .route-start-label { font-size: 13px; font-weight: 600; fill: var(--route); }
+
+  #results { list-style: none; margin: 0.75rem 0 0; padding: 0; max-height: 220px; overflow-y: auto; }
+  #results li { padding: 0.45rem 0.5rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem; }
+  #results li:hover { background: var(--hall); }
+  #results .code { font-weight: 700; margin-right: 0.4rem; }
+  #results .meta { color: var(--muted); font-size: 0.8rem; display: block; }
+
+  #detail .stand-code { font-size: 1.4rem; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+  #detail .company { margin: 0.1rem 0 0.6rem; color: var(--muted); }
+  #detail dl { display: grid; grid-template-columns: auto 1fr; gap: 0.25rem 0.75rem; margin: 0 0 0.9rem; font-size: 0.88rem; }
+  #detail dt { color: var(--muted); }
+  #detail dd { margin: 0; }
+  .actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  ol.steps { margin: 1rem 0 0; padding-left: 1.2rem; font-size: 0.88rem; }
+  ol.steps li { margin-bottom: 0.3rem; }
+  ol.steps .dist { color: var(--muted); }
+  .alt-links { margin-top: 0.9rem; font-size: 0.82rem; color: var(--muted); }
+  .alt-links a { color: inherit; margin-right: 0.75rem; white-space: nowrap; }
+  .note { font-size: 0.78rem; color: var(--muted); margin-top: 1rem; }
+  .empty { color: var(--muted); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<h1>SBC Summit 2026 — Floor Plan</h1>
+<p class="subtitle">
+  Feira Internacional de Lisboa &amp; MEO Arena · navegación híbrida:
+  Google Maps hasta la entrada, floor plan hasta el stand.
+  <a href="/">← volver a ClaudeEO</a>
+</p>
+
+<div class="layout">
+  <section>
+    <h2>Plano</h2>
+    <div id="plan"><p class="empty">Cargando plano…</p></div>
+  </section>
+
+  <div>
+    <section>
+      <h2>Buscar expositor o stand</h2>
+      <input id="search" placeholder="SSM1, SS1, payments, Hall 2…" autocomplete="off" />
+      <ul id="results"></ul>
+    </section>
+
+    <section id="detail" style="margin-top:1rem">
+      <h2>Stand</h2>
+      <p class="empty">Selecciona un stand en el plano o en la búsqueda.</p>
+    </section>
+  </div>
+</div>
+
+<p class="note" id="disclaimer"></p>
+
+<script>
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+let venue = null;
+let selected = null;   // stand code
+let origin = null;     // { lat, lng } once the visitor shares their position
+let lastDirections = null;
+
+async function api(path) {
+  const res = await fetch(path);
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || res.statusText);
+  return res.json();
+}
+
+function el(name, attrs = {}, text) {
+  const node = document.createElementNS(SVG_NS, name);
+  for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function waypoint(id) {
+  return venue.waypoints.find((w) => w.id === id);
+}
+
+function renderPlan() {
+  const svg = el('svg', {
+    viewBox: `0 0 ${venue.canvas.width} ${venue.canvas.height}`,
+    role: 'img',
+    'aria-label': `Plano de ${venue.name}`,
+  });
+
+  for (const building of venue.buildings) {
+    svg.append(el('rect', {
+      class: 'building', x: building.outline.x, y: building.outline.y,
+      width: building.outline.width, height: building.outline.height, rx: 10,
+    }));
+    svg.append(el('text', {
+      class: 'building-label', x: building.outline.x + 8, y: building.outline.y - 10,
+    }, building.name));
+  }
+
+  for (const corridor of venue.corridors) {
+    const from = waypoint(corridor.from);
+    const to = waypoint(corridor.to);
+    if (!from || !to) continue;
+    svg.append(el('line', {
+      class: 'corridor', x1: from.plan.x, y1: from.plan.y, x2: to.plan.x, y2: to.plan.y,
+    }));
+  }
+
+  for (const hall of venue.halls) {
+    svg.append(el('rect', {
+      class: 'hall', x: hall.outline.x, y: hall.outline.y,
+      width: hall.outline.width, height: hall.outline.height,
+    }));
+    svg.append(el('text', {
+      class: 'hall-label', x: hall.outline.x + 10, y: hall.outline.y + 24,
+    }, hall.name));
+  }
+
+  for (const entrance of venue.entrances) {
+    svg.append(el('circle', { class: 'entrance', cx: entrance.plan.x, cy: entrance.plan.y, r: 9 }));
+    // Flip the label inward near the right edge so it is not clipped by the viewBox.
+    const flip = entrance.plan.x > venue.canvas.width * 0.6;
+    svg.append(el('text', {
+      class: 'entrance-label',
+      x: entrance.plan.x + (flip ? -14 : 14),
+      y: entrance.plan.y + 5,
+      'text-anchor': flip ? 'end' : 'start',
+    }, entrance.name));
+  }
+
+  for (const stand of venue.stands) {
+    const rect = el('rect', {
+      class: 'stand', x: stand.outline.x, y: stand.outline.y,
+      width: stand.outline.width, height: stand.outline.height,
+      'data-code': stand.code, tabindex: '0', role: 'button',
+      'aria-label': `${stand.code} — ${stand.company}`,
+    });
+    rect.addEventListener('click', () => selectStand(stand.code));
+    rect.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectStand(stand.code); }
+    });
+    svg.append(rect);
+    svg.append(el('text', {
+      class: 'stand-label', 'data-code': stand.code,
+      x: stand.outline.x + stand.outline.width / 2,
+      y: stand.outline.y + stand.outline.height / 2 + 5,
+      'text-anchor': 'middle',
+    }, stand.code));
+  }
+
+  const layer = el('g', { id: 'route-layer' });
+  svg.append(layer);
+
+  const plan = document.getElementById('plan');
+  plan.replaceChildren(svg);
+}
+
+function drawRoute(directions) {
+  const layer = document.getElementById('route-layer');
+  if (!layer) return;
+  layer.replaceChildren();
+  if (!directions) return;
+
+  const points = directions.indoor.points.map((p) => `${p.x},${p.y}`).join(' ');
+  layer.append(el('polyline', { class: 'route-line', points }));
+
+  const start = directions.indoor.points[0];
+  layer.append(el('circle', { class: 'route-start', cx: start.x, cy: start.y, r: 11 }));
+  layer.append(el('text', {
+    class: 'route-start-label', x: start.x, y: start.y - 18, 'text-anchor': 'middle',
+  }, 'Estás aquí'));
+}
+
+function highlight(codes) {
+  const set = codes && codes.length ? new Set(codes) : null;
+  document.querySelectorAll('.stand, .stand-label').forEach((node) => {
+    const code = node.dataset.code;
+    node.classList.toggle('selected', code === selected);
+    node.classList.toggle('dimmed', Boolean(set) && !set.has(code));
+  });
+}
+
+function stepText(step) {
+  switch (step.kind) {
+    case 'enter-venue': return `Entra por <strong>${step.fromLabel}</strong>`;
+    case 'enter-hall':  return `Entra en <strong>${step.toLabel}</strong>`;
+    case 'arrive':      return `Llegas a <strong>${step.toLabel}</strong>`;
+    default:            return `Sigue hasta ${step.toLabel}`;
+  }
+}
+
+const REASON_TEXT = {
+  'requested': 'entrada seleccionada manualmente',
+  'nearest-to-visitor': 'la más cercana a tu ubicación',
+  'hall-default': 'entrada recomendada para este hall',
+};
+
+async function selectStand(code) {
+  selected = code;
+  highlight(null);
+  drawRoute(null);
+  lastDirections = null;
+
+  const stand = await api(`/api/floorplan/stands/${encodeURIComponent(code)}`);
+  const detail = document.getElementById('detail');
+  const aliases = stand.aliases.length ? ` <span class="meta">(también ${stand.aliases.join(', ')})</span>` : '';
+
+  detail.innerHTML = `
+    <h2>Stand</h2>
+    <p class="stand-code">📍 ${stand.code}${aliases}</p>
+    <p class="company">${stand.company}</p>
+    <dl>
+      <dt>Hall</dt><dd>${stand.hallName}</dd>
+      <dt>Categoría</dt><dd>${stand.category}</dd>
+      <dt>Recinto</dt><dd>${venue.name}</dd>
+    </dl>
+    <div class="actions">
+      <button id="btn-directions">🚶 Cómo llegar</button>
+      <button class="secondary" id="btn-locate">${origin ? '📡 Ubicación activa' : '📡 Usar mi ubicación'}</button>
+    </div>
+    <div id="route-detail"></div>
+  `;
+  document.getElementById('btn-directions').addEventListener('click', () => openDirections(code));
+  document.getElementById('btn-locate').addEventListener('click', requestLocation);
+}
+
+function requestLocation() {
+  const btn = document.getElementById('btn-locate');
+  if (!navigator.geolocation) {
+    btn.textContent = '📡 Geolocalización no disponible';
+    btn.disabled = true;
+    return;
+  }
+  btn.textContent = '📡 Localizando…';
+  btn.disabled = true;
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      origin = { lat: +pos.coords.latitude.toFixed(6), lng: +pos.coords.longitude.toFixed(6) };
+      btn.textContent = '📡 Ubicación activa';
+      if (selected) loadDirections(selected);
+    },
+    () => {
+      btn.textContent = '📡 Ubicación no disponible';
+      // Not fatal: Google Maps still resolves "current location" on the device itself.
+    },
+    { enableHighAccuracy: true, timeout: 8000 },
+  );
+}
+
+async function loadDirections(code) {
+  const params = new URLSearchParams({ mode: 'walking' });
+  if (origin) params.set('origin', `${origin.lat},${origin.lng}`);
+  const directions = await api(`/api/floorplan/stands/${encodeURIComponent(code)}/directions?${params}`);
+  lastDirections = directions;
+  drawRoute(directions);
+  renderRouteDetail(directions);
+  return directions;
+}
+
+function renderRouteDetail(d) {
+  const target = document.getElementById('route-detail');
+  if (!target) return;
+  const steps = d.indoor.steps.map((s) => {
+    const dist = s.distanceMeters ? ` <span class="dist">· ${s.distanceMeters} m</span>` : '';
+    return `<li>${stepText(s)}${dist}</li>`;
+  }).join('');
+
+  target.innerHTML = `
+    <ol class="steps">
+      <li>
+        <strong>Etapa 1 — exterior:</strong> Google Maps caminando hasta
+        ${d.entrance.name} <span class="dist">· ${REASON_TEXT[d.entranceReason]}</span>
+      </li>
+    </ol>
+    <ol class="steps" start="2">
+      ${steps}
+    </ol>
+    <p class="alt-links">
+      Etapa 2 — interior: ~${d.indoor.distanceMeters} m a pie.<br />
+      Abrir en:
+      <a href="${d.outdoor.links.universal}" target="_blank" rel="noopener">Google Maps</a>
+      <a href="${d.outdoor.links.iosApp}">app iOS</a>
+      <a href="${d.outdoor.links.androidApp}">app Android</a>
+      <a href="${d.outdoor.links.appleMaps}" target="_blank" rel="noopener">Apple Maps</a>
+    </p>
+  `;
+}
+
+async function openDirections(code) {
+  const directions = lastDirections && lastDirections.stand.code === code
+    ? lastDirections
+    : await loadDirections(code);
+  // Always hand Google Maps an entrance, never the stand: it has no indoor geometry.
+  window.open(directions.outdoor.links.universal, '_blank', 'noopener');
+}
+
+async function runSearch(query) {
+  const stands = await api(`/api/floorplan/stands?q=${encodeURIComponent(query)}`);
+  const list = document.getElementById('results');
+  if (!stands.length) {
+    list.innerHTML = '<li class="empty">Sin resultados.</li>';
+    highlight([]);
+    return;
+  }
+  list.innerHTML = stands.map((s) => `
+    <li data-code="${s.code}">
+      <span class="code">${s.code}</span>${s.company}
+      <span class="meta">${s.hallName} · ${s.category}</span>
+    </li>`).join('');
+  list.querySelectorAll('li[data-code]').forEach((node) => {
+    node.addEventListener('click', () => selectStand(node.dataset.code));
+  });
+  highlight(query.trim() ? stands.map((s) => s.code) : null);
+}
+
+async function init() {
+  venue = await api('/api/floorplan/venue');
+  renderPlan();
+  document.getElementById('disclaimer').textContent = venue.disclaimer;
+  await runSearch('');
+
+  let timer;
+  document.getElementById('search').addEventListener('input', (e) => {
+    clearTimeout(timer);
+    const value = e.target.value;
+    timer = setTimeout(() => runSearch(value), 150);
+  });
+}
+
+init().catch((e) => {
+  document.getElementById('plan').innerHTML = `<p class="empty">Error: ${e.message}</p>`;
+});
+</script>
+</body>
+</html>
