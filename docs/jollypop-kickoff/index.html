@@ -1,0 +1,584 @@
+<title>JollyPop Kick-off</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Figtree:wght@400;500;600;700;800&display=swap">
+<style>
+  :root{
+    color-scheme: dark;
+    --bg:#08074F;
+    --bg-deep:#050433;
+    --header:#0A0F33;
+    --card:#100E6B;
+    --card-2:#15137E;
+    --line:#2A2A92;
+    --text:#FFFFFF;
+    --muted:#B7BCE8;
+    --gold:#FBBF3C;
+    --gold-ink:#1A1030;
+    --pink:#F48C9B;
+    --cream:#FBEDA8;
+    --mint:#A4DEC8;
+    --violet:#A634AD;
+    --navy:#001789;
+    --sky:#6885BA;
+    --red:#C8282B;
+    --crit:#FF6B6B;
+    --warn:#FBBF3C;
+    --ok:#6FE3B2;
+    --display:"Baloo 2", "Arial Rounded MT Bold", system-ui, sans-serif;
+    --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:400 17px/1.6 var(--body);-webkit-font-smoothing:antialiased}
+  a{color:var(--gold)}
+  .wrap{max-width:1120px;margin:0 auto;padding-inline:20px}
+  .devbar{background:var(--red);font:700 12px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;text-align:center;padding:12px 16px;color:#fff}
+  header.top{background:var(--header);border-bottom:1px solid var(--line)}
+  header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:18px;flex-wrap:wrap}
+  header.top img{height:64px;width:auto}
+  .pillrow{display:flex;gap:10px;flex-wrap:wrap}
+  .pill{border:1.5px solid var(--muted);border-radius:999px;padding:8px 16px;font:700 12px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:#fff}
+  .pill.gold{background:var(--gold);border-color:var(--gold);color:var(--gold-ink)}
+
+  .eyebrow{font:800 13px/1.2 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin:0}
+  h1,h2,h3{text-wrap:balance;margin:0}
+  h1{font:800 clamp(34px,5.4vw,60px)/1.02 var(--display);letter-spacing:-.01em}
+  h2{font:800 clamp(26px,3.4vw,36px)/1.1 var(--display)}
+  h3{font:700 19px/1.3 var(--body)}
+  p{margin:0}
+  .lead{font-size:19px;color:var(--muted);max-width:62ch}
+
+  .hero{padding-block:44px 28px}
+  .herocard{background:var(--card);border-radius:28px;display:grid;grid-template-columns:1.25fr .75fr;overflow:hidden}
+  .herocard .copy{padding:44px 40px;display:grid;gap:18px;align-content:center}
+  .herocard .art{background:radial-gradient(circle at 50% 50%,#2B3FD0 0%,#15137E 55%,#100E6B 100%);display:grid;place-items:center;padding:24px}
+  .herocard .art img{width:min(300px,90%)}
+  .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;border-top:1px solid var(--line);padding-top:22px;margin-top:6px}
+  .facts dt{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .facts dd{margin:4px 0 0;color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums}
+
+  nav.toc{padding-block:8px 8px}
+  nav.toc ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+  nav.toc a{display:inline-block;text-decoration:none;color:#fff;border:1.5px solid var(--line);border-radius:999px;padding:8px 14px;font:600 14px/1 var(--body)}
+  nav.toc a:hover,nav.toc a:focus-visible{border-color:var(--gold);color:var(--gold);outline:none}
+
+  section.block{padding-block:40px}
+  .shead{display:grid;gap:10px;border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:26px}
+  .panel{background:var(--card);border-radius:24px;padding:28px}
+  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+  .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+  .stack{display:grid;gap:14px}
+  ul.clean{margin:0;padding-left:1.1em;display:grid;gap:8px}
+  ul.clean li::marker{color:var(--gold)}
+  .muted{color:var(--muted)}
+  .small{font-size:15px}
+
+  .logo-stage{background:#fff;border-radius:20px;display:grid;place-items:center;padding:18px}
+  .logo-stage img{max-height:220px;width:auto}
+  .logo-stage.dark{background:var(--header)}
+
+  .swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px}
+  .sw{border-radius:18px;overflow:hidden;background:var(--card-2)}
+  .sw .chip{height:78px}
+  .sw .meta{padding:10px 12px;display:grid;gap:2px}
+  .sw b{font-size:15px}
+  .sw code{font:600 13px/1.3 ui-monospace,Menlo,monospace;color:var(--muted)}
+  .sw span{font-size:13px;color:var(--muted)}
+
+  .typespec{display:grid;gap:18px}
+  .typespec .row{display:grid;grid-template-columns:170px 1fr;gap:16px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:14px}
+  .typespec .lbl{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 30px;border-radius:999px;font:800 15px/1 var(--body);letter-spacing:.12em;text-transform:uppercase}
+  .btn.gold{background:var(--gold);color:var(--gold-ink)}
+  .btn.ghost{border:1.5px solid #fff;color:#fff}
+  .btnrow{display:flex;gap:14px;flex-wrap:wrap}
+
+  table{border-collapse:collapse;width:100%;font-size:15.5px}
+  .tablewrap{overflow-x:auto;border-radius:20px;background:var(--card)}
+  th,td{text-align:left;padding:14px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font:800 12px/1.2 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);background:var(--card-2)}
+  tr:last-child td{border-bottom:0}
+  .sev{display:inline-block;border-radius:999px;padding:4px 10px;font:800 11px/1 var(--body);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+  .sev.crit{background:rgba(255,107,107,.16);color:var(--crit)}
+  .sev.high{background:rgba(251,191,60,.16);color:var(--warn)}
+  .sev.low{background:rgba(111,227,178,.14);color:var(--ok)}
+
+  .variant{display:grid;gap:10px}
+  .variant .tag{justify-self:start}
+  .variant.pick{outline:2px solid var(--gold)}
+
+  .copycard{display:grid;gap:10px}
+  .copycard .say{font:700 20px/1.3 var(--display);color:#fff}
+
+  .phases{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;counter-reset:ph}
+  .phase{background:var(--card);border-radius:20px;padding:20px;display:grid;gap:8px;align-content:start}
+  .phase .wk{font:800 12px/1 var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+  .phase h3{font-size:17px}
+
+  .check{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  .check li{display:grid;grid-template-columns:22px 1fr;gap:10px}
+  .check li::before{content:"";width:18px;height:18px;border-radius:6px;border:2px solid var(--gold);margin-top:4px}
+
+  footer.foot{background:var(--header);margin-top:40px;padding-block:40px;text-align:center}
+  footer.foot img{height:56px;width:auto}
+  footer.foot p{max-width:70ch;margin:14px auto 0;color:var(--muted);font-size:15px}
+
+  @media (max-width:860px){
+    .herocard{grid-template-columns:1fr}
+    .herocard .copy{padding:28px 22px}
+    .facts{grid-template-columns:repeat(2,1fr)}
+    .grid2,.grid3{grid-template-columns:1fr}
+    .phases{grid-template-columns:1fr 1fr}
+    .typespec .row{grid-template-columns:1fr}
+  }
+  @media (max-width:480px){ .phases{grid-template-columns:1fr} header.top img{height:52px} }
+  @media (prefers-reduced-motion:no-preference){ nav.toc a{transition:border-color .15s,color .15s} }
+</style>
+
+<div class="devbar">Guía interna · Kick-off de proyecto · 28 sep 2026</div>
+
+<header class="top">
+  <div class="wrap">
+    <img src="assets/jp-logo.png" alt="JollyPop Casino">
+    <div class="pillrow">
+      <span class="pill">jollypop.com</span>
+      <span class="pill">Offshore</span>
+      <span class="pill gold">USA · 35+</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="herocard">
+      <div class="copy">
+        <p class="eyebrow">Kick-off marketing, visual &amp; digital experience</p>
+        <h1>JollyPop Casino</h1>
+        <p class="lead">Guía de arranque para diseñar, construir y lanzar jollypop.com: un casino online moderno, navegable y colorido para jugadores de Estados Unidos mayores de 35 años. Toda la identidad sale de la maqueta <em>yourcasino-maqueta</em> y de la carpeta de Drive <em>JollyPop Project</em>.</p>
+        <dl class="facts">
+          <div><dt>Operador URL</dt><dd>jollypop.com</dd></div>
+          <div><dt>Mercado</dt><dd>Offshore</dd></div>
+          <div><dt>Público</dt><dd>EE. UU. · 35+</dd></div>
+          <div><dt>Idioma / moneda</dt><dd>EN-US · USD</dd></div>
+        </dl>
+      </div>
+      <div class="art"><img src="assets/jp-coin-rays.png" alt="Ficha dorada de JollyPop con rayos"></div>
+    </div>
+  </section>
+
+  <nav class="toc" aria-label="Contenido">
+    <ol>
+      <li><a href="#fuentes">Fuentes</a></li>
+      <li><a href="#marca">Marca y logo</a></li>
+      <li><a href="#color">Color</a></li>
+      <li><a href="#tipo">Tipografía y UI</a></li>
+      <li><a href="#audiencia">Audiencia 35+</a></li>
+      <li><a href="#voz">Voz y copy</a></li>
+      <li><a href="#sitio">Arquitectura</a></li>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#pagos">Pagos</a></li>
+      <li><a href="#hallazgos">Hallazgos</a></li>
+      <li><a href="#marketing">Marketing</a></li>
+      <li><a href="#plan">Plan</a></li>
+      <li><a href="#pendientes">Pendientes</a></li>
+    </ol>
+  </nav>
+
+  <!-- FUENTES -->
+  <section class="block" id="fuentes">
+    <div class="shead">
+      <p class="eyebrow">Material analizado</p>
+      <h2>De dónde sale esta guía</h2>
+    </div>
+    <div class="grid3">
+      <div class="panel stack">
+        <h3>Maqueta local</h3>
+        <p class="muted small">file:///Users/erickmendez/Downloads/yourcasino-maqueta/</p>
+        <ul class="clean small">
+          <li><b>index.html</b> con selector de variantes: Original, A · Lobby, B · Editorial, C · Mosaico</li>
+          <li><b>home-editorial.html</b>: hero de juego destacado + bonos</li>
+          <li><b>game.html</b>: lobby por categorías</li>
+        </ul>
+      </div>
+      <div class="panel stack">
+        <h3>Drive · JollyPop Project</h3>
+        <ul class="clean small">
+          <li>logotipo-jollypop.zip (AI, EPS, PNG, JPG)</li>
+          <li>otros-jollypop.zip (moneda y moneda con rayos)</li>
+          <li>yourcasino-con-logo.zip (maqueta, 26 MB)</li>
+          <li>MG GlobalServiceCR · Manual del API</li>
+          <li>Apple pay.mp4 (flujo de depósito de referencia)</li>
+        </ul>
+      </div>
+      <div class="panel stack">
+        <h3>Brief del cliente</h3>
+        <ul class="clean small">
+          <li>Sitio moderno y fácil de navegar</li>
+          <li>Colorido, con personalidad</li>
+          <li>Mercado americano</li>
+          <li>Jugador mayor de 35 años</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARCA -->
+  <section class="block" id="marca">
+    <div class="shead">
+      <p class="eyebrow">Identidad</p>
+      <h2>Marca y logotipo</h2>
+      <p class="lead">JollyPop es alegre, brillante y de arcade clásico. El logo mezcla letras infladas con degradados dulces, una ficha de casino con moneda dorada y los cuatro palos de la baraja.</p>
+    </div>
+    <div class="grid2">
+      <div class="stack">
+        <div class="logo-stage"><img src="assets/jp-logo.png" alt="Logo JollyPop sobre blanco"></div>
+        <div class="logo-stage dark"><img src="assets/jp-logo.png" alt="Logo JollyPop sobre navy"></div>
+      </div>
+      <div class="panel stack">
+        <h3>Anatomía del logo</h3>
+        <ul class="clean">
+          <li><b>JOLLY</b>: letras redondeadas con degradado rosa → lavanda y brillo crema.</li>
+          <li><b>POP</b>: degradado lavanda → azul cielo; la primera O es una ficha con moneda dorada y signo $.</li>
+          <li><b>Ficha</b>: anillo con segmentos amarillo, magenta y cian, contorno navy #001789.</li>
+          <li><b>Palos</b> ♦ ♠ ♥ ♣ sobre la J–L en azul y rosa.</li>
+          <li><b>CASINO</b>: mayúsculas navy con mucho espaciado, contorno blanco.</li>
+          <li><b>Rayos</b> azules detrás de la ficha: usarlos solo en la versión grande (hero, splash, redes).</li>
+        </ul>
+        <h3>Reglas de uso</h3>
+        <ul class="clean small">
+          <li>Área de respeto: el alto de la ficha en los cuatro lados.</li>
+          <li>Tamaño mínimo digital: 120 px de ancho; en header 180–240 px.</li>
+          <li>Sobre navy funciona sin cambios; sobre blanco también (versión principal).</li>
+          <li>No recolorear, no quitar el contorno navy, no estirar, no poner sobre fotos cargadas sin velo oscuro.</li>
+          <li>Favicon / app icon: solo la moneda (<code>coin.png</code>).</li>
+        </ul>
+        <div class="btnrow" style="align-items:center">
+          <img src="assets/jp-coin.png" alt="Moneda JollyPop" style="width:72px">
+          <span class="muted small">Moneda sola: favicon, loaders, íconos de saldo y recompensas.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COLOR -->
+  <section class="block" id="color">
+    <div class="shead">
+      <p class="eyebrow">Paleta</p>
+      <h2>Color</h2>
+      <p class="lead">Dos capas: la paleta del logo (extraída de los archivos fuente) y la paleta de interfaz de la maqueta. La interfaz es navy profundo con un único acento dorado para acciones; los tonos dulces del logo aparecen en ilustración, promociones y estados.</p>
+    </div>
+    <h3 style="margin-bottom:14px">Logo e ilustración</h3>
+    <div class="swatches" style="margin-bottom:28px">
+      <div class="sw"><div class="chip" style="background:#001789"></div><div class="meta"><b>Pop Navy</b><code>#001789</code><span>Contornos, "CASINO"</span></div></div>
+      <div class="sw"><div class="chip" style="background:#F48C9B"></div><div class="meta"><b>Bubblegum</b><code>#F48C9B</code><span>JOLLY, promos</span></div></div>
+      <div class="sw"><div class="chip" style="background:#A634AD"></div><div class="meta"><b>Grape</b><code>#A634AD</code><span>Segmentos de ficha, VIP</span></div></div>
+      <div class="sw"><div class="chip" style="background:#6885BA"></div><div class="meta"><b>Periwinkle</b><code>#6885BA</code><span>POP, secundarios</span></div></div>
+      <div class="sw"><div class="chip" style="background:#A4DEC8"></div><div class="meta"><b>Mint</b><code>#A4DEC8</code><span>Brillos, éxito</span></div></div>
+      <div class="sw"><div class="chip" style="background:#FBEDA8"></div><div class="meta"><b>Cream</b><code>#FBEDA8</code><span>Highlights</span></div></div>
+      <div class="sw"><div class="chip" style="background:#F2C420"></div><div class="meta"><b>Coin Gold</b><code>#F2C420</code><span>Moneda, jackpots</span></div></div>
+      <div class="sw"><div class="chip" style="background:#F29E22"></div><div class="meta"><b>Coin Amber</b><code>#F29E22</code><span>Sombra de moneda</span></div></div>
+    </div>
+    <h3 style="margin-bottom:14px">Interfaz (maqueta)</h3>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#08074F;box-shadow:inset 0 0 0 1px #2A2A92"></div><div class="meta"><b>Night Navy</b><code>#08074F</code><span>Fondo de página</span></div></div>
+      <div class="sw"><div class="chip" style="background:#0A0F33;box-shadow:inset 0 0 0 1px #2A2A92"></div><div class="meta"><b>Header</b><code>#0A0F33</code><span>Header y footer</span></div></div>
+      <div class="sw"><div class="chip" style="background:#100E6B;box-shadow:inset 0 0 0 1px #2A2A92"></div><div class="meta"><b>Card</b><code>#100E6B</code><span>Paneles, carruseles</span></div></div>
+      <div class="sw"><div class="chip" style="background:#FBBF3C"></div><div class="meta"><b>Jackpot Gold</b><code>#FBBF3C</code><span>CTA, títulos de sección, datos</span></div></div>
+      <div class="sw"><div class="chip" style="background:#FFFFFF"></div><div class="meta"><b>White</b><code>#FFFFFF</code><span>Texto, botón outline</span></div></div>
+      <div class="sw"><div class="chip" style="background:#B7BCE8"></div><div class="meta"><b>Mist</b><code>#B7BCE8</code><span>Texto secundario</span></div></div>
+    </div>
+    <div class="panel" style="margin-top:22px">
+      <h3>Temas</h3>
+      <p class="muted" style="margin-top:6px">La maqueta trae un selector de 3 temas en el header: <b>Navy + oro</b> (principal), <b>Negro + oro</b> y <b>Claro + oro</b>. Recomendación: lanzar con Navy como default y mantener Claro como opción de accesibilidad (útil para jugadores 35+ con fatiga visual). Negro puede quedar para una fase 2.</p>
+    </div>
+  </section>
+
+  <!-- TIPOGRAFIA -->
+  <section class="block" id="tipo">
+    <div class="shead">
+      <p class="eyebrow">Sistema visual</p>
+      <h2>Tipografía y componentes</h2>
+      <p class="lead">La maqueta usa una sans geométrica en negrita con etiquetas en mayúsculas espaciadas. Proponemos una display redondeada que haga eco del logo y un cuerpo muy legible a 17–18 px.</p>
+    </div>
+    <div class="grid2">
+      <div class="panel typespec">
+        <div class="row"><span class="lbl">Display · Baloo 2 800</span><span style="font:800 40px/1 var(--display)">Gold Nugget Rush 2</span></div>
+        <div class="row"><span class="lbl">H2 · Baloo 2 800</span><span style="font:800 28px/1.1 var(--display)">Welcome Bonus</span></div>
+        <div class="row"><span class="lbl">Eyebrow · Figtree 800</span><span class="eyebrow">Available now</span></div>
+        <div class="row"><span class="lbl">Body · Figtree 400 · 18 px</span><span style="font-size:18px">This 5-reel video slot takes you deeper into the mine, where every spin can strike gold.</span></div>
+        <div class="row" style="border:0;padding:0"><span class="lbl">Datos · Figtree 700</span><span style="color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums">RTP 97.02% · 5 × 3 · Max win 5,000×</span></div>
+      </div>
+      <div class="panel stack">
+        <h3>Componentes de la maqueta</h3>
+        <div class="btnrow"><span class="btn gold">Play demo</span><span class="btn ghost">View games</span></div>
+        <ul class="clean small">
+          <li><b>Botones pill</b>: primario dorado sólido, secundario outline blanco. Alto mínimo 48–52 px.</li>
+          <li><b>Header</b>: logo, selector de tema, campos User/Password inline, LOGIN (outline) y SIGN UP (dorado).</li>
+          <li><b>Hero de juego</b>: eyebrow "Available now", título, descripción, 2 CTAs y ficha técnica RTP / Reels / Max win.</li>
+          <li><b>Carrusel por categoría</b> en panel redondeado (radio ~24 px) con título dorado y línea divisoria.</li>
+          <li><b>Tile de juego</b> cuadrado; al hover muestra nombre + PLAY NOW + DEMO.</li>
+          <li><b>Banner de bono</b> ancho + tarjeta compuesta (Welcome, VIP Club, Challenges).</li>
+          <li><b>Footer</b> centrado: logo, texto legal, juego responsable, copyright.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUDIENCIA -->
+  <section class="block" id="audiencia">
+    <div class="shead">
+      <p class="eyebrow">Jugador objetivo</p>
+      <h2>Adultos en EE. UU., 35 años o más</h2>
+      <p class="lead">Juegan en el celular por la noche y en la laptop los fines de semana. Prefieren slots clásicos con temas familiares, bonos claros y un cajero que funcione a la primera. Desconfían de lo que parece turbio: la confianza es la conversión.</p>
+    </div>
+    <div class="grid3">
+      <div class="panel stack">
+        <h3>Legibilidad</h3>
+        <ul class="clean small">
+          <li>Cuerpo 17–18 px, nunca menos de 15 px.</li>
+          <li>Contraste AA mínimo (4.5:1); el oro sobre navy cumple.</li>
+          <li>Botones de 48 px de alto mínimo y separados.</li>
+          <li>Tema claro disponible.</li>
+        </ul>
+      </div>
+      <div class="panel stack">
+        <h3>Navegación simple</h3>
+        <ul class="clean small">
+          <li>Máximo 6 entradas en el menú principal.</li>
+          <li>Buscador de juegos visible.</li>
+          <li>"Recently played" y "Favorites" al iniciar sesión.</li>
+          <li>Barra inferior fija en móvil: Home, Games, Promos, Cashier, Account.</li>
+        </ul>
+      </div>
+      <div class="panel stack">
+        <h3>Confianza</h3>
+        <ul class="clean small">
+          <li>Chat en vivo 24/7 y teléfono visibles.</li>
+          <li>Términos de bono en lenguaje simple junto a la oferta.</li>
+          <li>Tiempos de retiro reales publicados.</li>
+          <li>21+ y juego responsable en header de registro y footer.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- VOZ -->
+  <section class="block" id="voz">
+    <div class="shead">
+      <p class="eyebrow">Voz y tono</p>
+      <h2>Alegre, claro y honesto</h2>
+      <p class="lead">Hablamos como un anfitrión simpático de Las Vegas: energía positiva, frases cortas, cero letra chica escondida. Todo el sitio en inglés americano, montos en USD y fechas MM/DD/YYYY.</p>
+    </div>
+    <div class="grid3">
+      <div class="panel copycard"><p class="eyebrow">Hero</p><p class="say">Spin, smile, win. Your new favorite casino is here.</p></div>
+      <div class="panel copycard"><p class="eyebrow">Welcome offer</p><p class="say">Get 200% up to $500 on your first deposit.</p><p class="muted small">Plus clear terms right below: wagering, minimum deposit, eligible games.</p></div>
+      <div class="panel copycard"><p class="eyebrow">Cashier</p><p class="say">Add funds in minutes. Cash out fast.</p></div>
+    </div>
+    <div class="grid2" style="margin-top:20px">
+      <div class="panel stack"><h3>Sí</h3><ul class="clean small"><li>Verbos directos: Play, Deposit, Cash out, Claim.</li><li>Números concretos: "$500", "24–48 hours".</li><li>Humor ligero en microcopy (loaders, estados vacíos).</li></ul></div>
+      <div class="panel stack"><h3>No</h3><ul class="clean small"><li>Mezclar español (hoy: "Ver catálogo", "Ver bonos").</li><li>Promesas de ganancia garantizada.</li><li>Jerga cripto o técnica en el cajero.</li></ul></div>
+    </div>
+  </section>
+
+  <!-- ARQUITECTURA -->
+  <section class="block" id="sitio">
+    <div class="shead">
+      <p class="eyebrow">Experiencia digital</p>
+      <h2>Arquitectura del sitio</h2>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Página</th><th>Contenido clave</th><th>Estado en maqueta</th></tr></thead>
+        <tbody>
+          <tr><td><b>Home</b></td><td>Juego destacado, bono de bienvenida, carruseles por categoría, jackpots</td><td>4 variantes</td></tr>
+          <tr><td><b>Games / Lobby</b></td><td>Filtros: Slots, Hold &amp; Win, Table Games, Live Casino, Arcade, New; buscador</td><td>game.html</td></tr>
+          <tr><td><b>Game detail / launch</b></td><td>RTP, líneas, max win, Play / Demo, juegos similares</td><td>Parcial (en hero)</td></tr>
+          <tr><td><b>Promotions</b></td><td>Welcome, reload, free spins, torneos; términos visibles</td><td>Solo banners</td></tr>
+          <tr><td><b>VIP Club</b></td><td>Niveles, beneficios, host personal</td><td>Solo banner</td></tr>
+          <tr><td><b>Cashier</b></td><td>Depósitos, retiros, historial, estado de transacción</td><td>Pendiente</td></tr>
+          <tr><td><b>Sign up / Login</b></td><td>Registro en 3 pasos, verificación por email/SMS, 21+</td><td>Solo campos en header</td></tr>
+          <tr><td><b>Account</b></td><td>Perfil, KYC, límites de juego, bonos activos</td><td>Pendiente</td></tr>
+          <tr><td><b>Help / FAQ</b></td><td>Chat, teléfono, preguntas de pagos y bonos</td><td>Pendiente</td></tr>
+          <tr><td><b>Legal</b></td><td>Terms, Privacy, Bonus Terms, Responsible Gaming</td><td>Pendiente</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- HOME VARIANTES -->
+  <section class="block" id="home">
+    <div class="shead">
+      <p class="eyebrow">Home variations</p>
+      <h2>¿Qué home lanzamos?</h2>
+      <p class="lead">La maqueta propone cuatro homes. Para un jugador 35+ gana la que muestra un juego a la vez con información clara y el bono a la vista.</p>
+    </div>
+    <div class="grid2">
+      <div class="panel variant"><span class="pill">Original</span><p class="small muted">Home base de la plantilla. Sirve como referencia de contenido.</p></div>
+      <div class="panel variant"><span class="pill">A · Lobby</span><p class="small muted">Directo a la grilla de juegos. Rápido para jugadores frecuentes; abrumador en la primera visita.</p></div>
+      <div class="panel variant pick"><span class="pill gold">B · Editorial · recomendada</span><p class="small">Hero de un juego (Gold Nugget Rush 2) con descripción, Play Demo y ficha RTP / Reels / Max win. Lectura calmada, jerarquía clara y mejor conversión a demo.</p></div>
+      <div class="panel variant"><span class="pill">C · Mosaico</span><p class="small muted">Hero + tarjeta lateral (Thunder Cash) + bonos. Tomar su columna de bonos y agregarla a B bajo el hero.</p></div>
+    </div>
+    <div class="panel" style="margin-top:20px">
+      <h3>Orden propuesto de la home</h3>
+      <ul class="clean small" style="margin-top:10px">
+        <li>Hero editorial rotativo (3 juegos máx.) + banner de Welcome Bonus.</li>
+        <li>Popular now · New games · Hold &amp; Win · Table games · Live casino.</li>
+        <li>Promotions y VIP Club.</li>
+        <li>Cómo depositar en 3 pasos y métodos aceptados.</li>
+        <li>Footer con soporte, legales, 21+ y juego responsable.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- PAGOS -->
+  <section class="block" id="pagos">
+    <div class="shead">
+      <p class="eyebrow">Cashier</p>
+      <h2>Pagos</h2>
+      <p class="lead">Dos rieles documentados en Drive. El cajero debe presentarlos como opciones simples, con el tiempo estimado y el monto mínimo al lado de cada una.</p>
+    </div>
+    <div class="grid2">
+      <div class="panel stack">
+        <h3>Global Service CR · remesas</h3>
+        <p class="small muted">API web con usuario/contraseña (<code>globalservicecr.com/api</code>). Estados: pending, approved, rejected.</p>
+        <ul class="clean small">
+          <li><b>Depósito</b> (<code>Add_deposit</code>): el jugador envía por su agencia de remesas y registra remitente, ciudad, estado, número de control y monto.</li>
+          <li><b>Receptor</b> (<code>GetName</code>): el sistema asigna el nombre a quién enviar según el monto.</li>
+          <li><b>Retiro</b> (<code>Add_payout</code>): nombre, apellido, ciudad/estado y monto del jugador.</li>
+          <li><b>Proveedores</b>: MoneyGram, Ria, Boss Revolution, Delgado Travel, Intermex, Maxi, Barri, La Nacional, Dinex, Remitly.</li>
+        </ul>
+        <p class="small">UX: guía paso a paso con el nombre del receptor, un botón para copiarlo, campo para el número de control y un estado visible "Pending review → Approved".</p>
+      </div>
+      <div class="panel stack">
+        <h3>Tarjeta, Apple Pay y Google Pay</h3>
+        <p class="small muted">El video de referencia muestra una pasarela de compra de cripto (ej. $30 → LTC) con Apple Pay, Google Pay y Visa/Mastercard.</p>
+        <ul class="clean small">
+          <li>Flujo: email + código → datos personales (nombre, fecha de nacimiento) → método → confirmación con Face ID / passcode.</li>
+          <li>Presentarlo al jugador como "Card / Apple Pay / Google Pay", sin hablar de cripto en la interfaz principal.</li>
+          <li>Mostrar el monto final en USD con todas las comisiones incluidas.</li>
+          <li>Montos rápidos: $30, $50, $100, $250.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- HALLAZGOS -->
+  <section class="block" id="hallazgos">
+    <div class="shead">
+      <p class="eyebrow">Auditoría de la maqueta</p>
+      <h2>Qué corregir antes de diseñar</h2>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Prioridad</th><th>Hallazgo</th><th>Acción</th></tr></thead>
+        <tbody>
+          <tr><td><span class="sev crit">Crítico</span></td><td>El footer dice "Copyright © 2001-2026, Rational Intellectual Holdings Limited", que es la entidad de otra marca.</td><td>Reemplazar por la razón social real del operador de JollyPop.</td></tr>
+          <tr><td><span class="sev crit">Crítico</span></td><td>No hay aviso 21+, licencia ni enlaces legales.</td><td>Agregar licencia/jurisdicción, Terms, Privacy, Bonus Terms y Responsible Gaming.</td></tr>
+          <tr><td><span class="sev high">Alto</span></td><td>Arte de bono en euros: "200% up to 500€ + 200 FS".</td><td>Rehacer en USD: "200% up to $500 + 200 Free Spins".</td></tr>
+          <tr><td><span class="sev high">Alto</span></td><td>Textos en español: "VER CATÁLOGO", "VER BONOS".</td><td>"VIEW GAMES", "SEE BONUSES".</td></tr>
+          <tr><td><span class="sev high">Alto</span></td><td>"Live Casino" y "Table Games" muestran slots.</td><td>Poblar con mesas reales o renombrar la categoría.</td></tr>
+          <tr><td><span class="sev high">Alto</span></td><td>Login con campos User/Password en el header; no escala a móvil.</td><td>Botones LOG IN / SIGN UP que abren un modal.</td></tr>
+          <tr><td><span class="sev low">Medio</span></td><td>Datos inconsistentes: dice "5-reel, 3-row" y la ficha muestra "Reels 6 × 3".</td><td>Tomar la ficha del proveedor del juego.</td></tr>
+          <tr><td><span class="sev low">Medio</span></td><td>Error gramatical en footer: "We offers a premium…".</td><td>"JollyPop offers a premium…"</td></tr>
+          <tr><td><span class="sev low">Medio</span></td><td>Barra roja "Home variations" visible.</td><td>Solo en staging; quitar en producción.</td></tr>
+          <tr><td><span class="sev low">Medio</span></td><td>Tile "RelicRiches" sin arte (estado hover sin imagen).</td><td>Cargar el thumbnail y un placeholder de marca.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- MARKETING -->
+  <section class="block" id="marketing">
+    <div class="shead">
+      <p class="eyebrow">Go-to-market</p>
+      <h2>Marketing de lanzamiento</h2>
+    </div>
+    <div class="grid3">
+      <div class="panel stack">
+        <h3>Canales</h3>
+        <ul class="clean small">
+          <li>Afiliados y portales de review offshore.</li>
+          <li>SEO de contenido: guías de slots, RTP, "how to deposit".</li>
+          <li>Email y SMS (CRM) con segmentos por actividad.</li>
+          <li>WhatsApp para soporte y reactivación.</li>
+          <li>Redes: marca y comunidad, respetando las políticas de cada plataforma sobre juego.</li>
+        </ul>
+      </div>
+      <div class="panel stack">
+        <h3>Ofertas</h3>
+        <ul class="clean small">
+          <li>Welcome: 200% hasta $500 + 200 free spins (validar con cliente).</li>
+          <li>Reload semanal y cashback de fin de semana.</li>
+          <li>VIP Club con niveles de color de la ficha: Mint, Periwinkle, Grape, Gold.</li>
+          <li>Challenges / torneos mensuales.</li>
+        </ul>
+      </div>
+      <div class="panel stack">
+        <h3>Calendario Q4 2026 – Q1 2027</h3>
+        <ul class="clean small">
+          <li>Oct: lanzamiento + Halloween.</li>
+          <li>Nov: Thanksgiving y Black Friday.</li>
+          <li>Dic: Christmas con Greedy Goblins.</li>
+          <li>Feb: Super Bowl weekend.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:20px">
+      <h3>KPIs de lanzamiento</h3>
+      <div class="facts" style="border:0;padding-top:12px">
+        <div><dt>Registro → 1er depósito</dt><dd>Meta a definir</dd></div>
+        <div><dt>Depósito aprobado</dt><dd>% por método</dd></div>
+        <div><dt>Retención D7 / D30</dt><dd>Cohortes</dd></div>
+        <div><dt>Tiempo de retiro</dt><dd>Horas promedio</dd></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAN -->
+  <section class="block" id="plan">
+    <div class="shead">
+      <p class="eyebrow">Entregables</p>
+      <h2>Plan de trabajo</h2>
+      <p class="lead">Cinco fases secuenciales. Las semanas son una estimación inicial para validar en el kick-off.</p>
+    </div>
+    <div class="phases">
+      <div class="phase"><span class="wk">Semana 1</span><h3>Descubrimiento</h3><p class="small muted">Kick-off, respuestas pendientes, proveedores de juegos y pagos, licencia.</p></div>
+      <div class="phase"><span class="wk">Semana 2</span><h3>Sistema visual</h3><p class="small muted">Tokens en Figma, tipografía, componentes, 3 temas, iconografía de moneda.</p></div>
+      <div class="phase"><span class="wk">Semanas 3–4</span><h3>UX / UI</h3><p class="small muted">Home B, lobby, juego, promos, VIP, cajero, registro. Desktop y móvil.</p></div>
+      <div class="phase"><span class="wk">Semanas 5–7</span><h3>Desarrollo</h3><p class="small muted">Front, integración de juegos y Global Service CR, pasarela de tarjeta, CRM.</p></div>
+      <div class="phase"><span class="wk">Semana 8</span><h3>QA y lanzamiento</h3><p class="small muted">Pruebas en dispositivos, accesibilidad, legales, campaña de lanzamiento.</p></div>
+    </div>
+  </section>
+
+  <!-- PENDIENTES -->
+  <section class="block" id="pendientes">
+    <div class="shead">
+      <p class="eyebrow">Para la reunión</p>
+      <h2>Preguntas abiertas al cliente</h2>
+    </div>
+    <div class="grid2">
+      <div class="panel"><ul class="check">
+        <li>Razón social, licencia y jurisdicción para el footer y los términos.</li>
+        <li>Proveedor(es) de juegos y catálogo final (la maqueta usa títulos tipo Betsoft).</li>
+        <li>¿Hay live casino real y mesas? Si no, quitamos esas categorías.</li>
+        <li>Monto y condiciones exactas del Welcome Bonus en USD.</li>
+        <li>Estados de EE. UU. donde no se aceptará jugadores.</li>
+      </ul></div>
+      <div class="panel"><ul class="check">
+        <li>Credenciales de producción de Global Service CR y límites por método.</li>
+        <li>Proveedor de la pasarela Apple Pay / tarjeta mostrada en el video.</li>
+        <li>Proceso de KYC y documentos que se pedirán.</li>
+        <li>Canales de soporte: horario, teléfono, chat, WhatsApp.</li>
+        <li>Dominio de email transaccional y remitente de SMS.</li>
+      </ul></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <img src="assets/jp-logo.png" alt="JollyPop Casino">
+    <p>Guía interna de kick-off para jollypop.com. Identidad tomada de la maqueta yourcasino-maqueta y de la carpeta de Drive "JollyPop Project". Please play responsibly · 21+.</p>
+  </div>
+</footer>
