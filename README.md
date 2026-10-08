@@ -24,6 +24,11 @@ marketing skills behind one Express API (plus a minimal test UI).
   deterministically from overdue and blocked tasks, blocked integrations, and days to
   go-live; Claude writes status reports, the portfolio digest, and intake briefs on top
   of those facts. Also available as a Claude Code subagent: `.claude/agents/pm-ops.md`.
+  **Tracking panel** at `http://localhost:3000/pm.html` (Spanish UI): KPI tiles, a board by
+  phase, a kickoff → go-live timeline, the integrations pipeline, the priority action list,
+  and a per-project drawer to tick off the checklist, block/unblock tasks, change
+  integration status, log notes and generate AI status reports. Run `npm run seed:pm` to
+  load demo projects.
 
 Skills call Claude through `src/claudeClient.ts`. If `ANTHROPIC_API_KEY` is not set,
 that wrapper returns a deterministic mock response instead of calling the API, so the
@@ -80,6 +85,7 @@ curl -X POST localhost:3000/api/skills/pm-status-report \
 - `npm run build` — compile to `dist/`
 - `npm start` — run the compiled server
 - `npm run typecheck` — type-check without emitting
+- `npm run seed:pm` — load demo PM Ops projects (respects `DB_PATH`)
 
 ## API reference
 
