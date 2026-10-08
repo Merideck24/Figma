@@ -80,7 +80,7 @@
 </head>
 <body>
 <h1>ClaudeEO</h1>
-<p class="subtitle">Auto CRM · WhatsApp Agent Kit · Claude Ads · Combo Marketing — <span id="mode">checking mode…</span></p>
+<p class="subtitle">Auto CRM · WhatsApp Agent Kit · Claude Ads · Combo Marketing · Presentations — <span id="mode">checking mode…</span></p>
 
 <section>
   <h2>Auto CRM — Contacts</h2>
@@ -133,6 +133,20 @@
   </select>
   <button onclick="generateCombo()">Generate campaign plan</button>
   <pre id="m-output"></pre>
+</section>
+
+<section>
+  <h2>Product Presentations</h2>
+  <label>Product</label><input id="p-product" placeholder="Wireless earbuds Pro" />
+  <label>Description</label><textarea id="p-description" rows="2" placeholder="Key features, price, differentiators…"></textarea>
+  <label>Audience</label><input id="p-audience" placeholder="Retail distributors" />
+  <label>Goal (optional)</label><input id="p-goal" placeholder="Close a pilot order" />
+  <label>Tone (optional)</label><input id="p-tone" placeholder="professional and enthusiastic" />
+  <label>Language</label><input id="p-language" value="español" />
+  <label>Slides</label><input id="p-slides" type="number" min="3" max="15" value="8" />
+  <button onclick="generatePresentation()">Generate presentation</button>
+  <button class="secondary" onclick="openPresentation()">Open slideshow</button>
+  <pre id="p-output"></pre>
 </section>
 
 <script>
@@ -216,6 +230,48 @@ async function generateCombo() {
     });
     out.textContent = `Segment size: ${r.segmentSize}\n\n${r.plan}`;
   } catch (e) { out.textContent = 'Error: ' + e.message; }
+}
+
+function presentationBody() {
+  return JSON.stringify({
+    product: document.getElementById('p-product').value,
+    description: document.getElementById('p-description').value || undefined,
+    audience: document.getElementById('p-audience').value,
+    goal: document.getElementById('p-goal').value || undefined,
+    tone: document.getElementById('p-tone').value || undefined,
+    language: document.getElementById('p-language').value || undefined,
+    slideCount: Number(document.getElementById('p-slides').value) || undefined,
+  });
+}
+
+async function generatePresentation() {
+  const out = document.getElementById('p-output');
+  out.textContent = 'Thinking…';
+  try {
+    const { deck } = await api('/api/skills/product-presentation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: presentationBody(),
+    });
+    out.textContent = `${deck.title}\n${deck.subtitle}\n\n` + deck.slides.map((s, i) =>
+      `${i + 1}. ${s.title}\n` + s.bullets.map(b => `   • ${b}`).join('\n') + `\n   Notes: ${s.speakerNotes}`
+    ).join('\n\n');
+  } catch (e) { out.textContent = 'Error: ' + e.message; }
+}
+
+async function openPresentation() {
+  const out = document.getElementById('p-output');
+  const win = window.open('', '_blank');
+  out.textContent = 'Building slideshow…';
+  const res = await fetch('/api/skills/product-presentation?format=html', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: presentationBody(),
+  });
+  if (!res.ok) { win?.close(); out.textContent = 'Error: ' + (await res.json()).error; return; }
+  const url = URL.createObjectURL(new Blob([await res.text()], { type: 'text/html' }));
+  if (win) win.location = url; else window.open(url, '_blank');
+  out.textContent = 'Slideshow opened in a new tab.';
 }
 
 loadMode();

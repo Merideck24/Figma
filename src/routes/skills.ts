@@ -3,6 +3,7 @@ import { contactsStore } from "../db.js";
 import { draftWhatsappReply } from "../skills/whatsappAgent.js";
 import { generateAdCopy } from "../skills/claudeAds.js";
 import { generateComboCampaign } from "../skills/comboMarketing.js";
+import { generateProductPresentation, renderPresentationHtml } from "../skills/productPresentation.js";
 
 export const skillsRouter = Router();
 
@@ -34,4 +35,18 @@ skillsRouter.post("/combo-campaign", async (req, res) => {
   }
   const result = await generateComboCampaign({ goal, audience, stageFilter });
   res.json(result);
+});
+
+skillsRouter.post("/product-presentation", async (req, res) => {
+  const { product, description, audience, goal, tone, language, slideCount } = req.body ?? {};
+  if (!product || !audience) {
+    return res.status(400).json({ error: "product and audience are required" });
+  }
+  try {
+    const deck = await generateProductPresentation({ product, description, audience, goal, tone, language, slideCount });
+    if (req.query.format === "html") return res.type("html").send(renderPresentationHtml(deck));
+    res.json({ deck });
+  } catch (err) {
+    res.status(502).json({ error: err instanceof Error ? err.message : String(err) });
+  }
 });

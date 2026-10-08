@@ -14,6 +14,11 @@ marketing skills behind one Express API (plus a minimal test UI).
     product/audience/platform.
   - **Combo Marketing** (`src/skills/comboMarketing.ts`) — generates a multi-channel
     (WhatsApp + ads + email) campaign plan, informed by the current CRM segment.
+  - **Product Presentations** (`src/skills/productPresentation.ts`) — builds a product
+    slide deck (hook → problem → solution → features → benefits → proof → offer → CTA)
+    with speaker notes, as JSON or as a self-contained HTML slideshow (arrow keys to
+    navigate, `N` for speaker notes, print to export PDF). Defaults to Spanish; never
+    invents prices or metrics, using placeholders like `[precio]` instead.
 
 Skills call Claude through `src/claudeClient.ts`. If `ANTHROPIC_API_KEY` is not set,
 that wrapper returns a deterministic mock response instead of calling the API, so the
@@ -45,6 +50,11 @@ curl -X POST localhost:3000/api/skills/ad-copy \
 curl -X POST localhost:3000/api/skills/combo-campaign \
   -H 'Content-Type: application/json' \
   -d '{"goal":"Re-engage cold leads","audience":"Leads inactive 30+ days"}'
+
+curl -X POST 'localhost:3000/api/skills/product-presentation?format=html' \
+  -H 'Content-Type: application/json' \
+  -d '{"product":"Audífonos Pro","audience":"Distribuidores","goal":"Cerrar pedido piloto"}' \
+  > presentacion.html
 ```
 
 ## Scripts
@@ -67,6 +77,7 @@ curl -X POST localhost:3000/api/skills/combo-campaign \
 | POST | `/api/skills/whatsapp-reply` | `{ contactId, message }` → drafts + logs a WhatsApp reply |
 | POST | `/api/skills/ad-copy` | `{ product, audience, platform }` → ad copy variants |
 | POST | `/api/skills/combo-campaign` | `{ goal, audience, stageFilter? }` → multi-channel campaign plan |
+| POST | `/api/skills/product-presentation` | `{ product, audience, description?, goal?, tone?, language?, slideCount? }` → `{ deck }`; add `?format=html` for a ready-to-present slideshow |
 
 ## Not yet wired up
 
