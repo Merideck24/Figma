@@ -80,7 +80,7 @@
 </head>
 <body>
 <h1>ClaudeEO</h1>
-<p class="subtitle">Auto CRM · WhatsApp Agent Kit · Claude Ads · Combo Marketing — <span id="mode">checking mode…</span></p>
+<p class="subtitle">Auto CRM · WhatsApp Agent Kit · Claude Ads · Combo Marketing · Accounting Agent — <span id="mode">checking mode…</span></p>
 
 <section>
   <h2>Auto CRM — Contacts</h2>
@@ -133,6 +133,33 @@
   </select>
   <button onclick="generateCombo()">Generate campaign plan</button>
   <pre id="m-output"></pre>
+</section>
+
+<section>
+  <h2>Accounting Agent</h2>
+  <label>Invoice type</label>
+  <select id="f-kind">
+    <option value="payable">payable — supplier bill</option>
+    <option value="receivable">receivable — customer invoice</option>
+  </select>
+  <label>Invoice text (paste from PDF/email)</label>
+  <textarea id="f-text" rows="6" placeholder="Proveedor: Papelería del Norte&#10;Factura No. A-1043&#10;Fecha: 2026-09-01&#10;Vencimiento: 2026-09-30&#10;Subtotal: 1,000.00 MXN&#10;IVA: 160.00&#10;Total: 1,160.00"></textarea>
+  <button onclick="processInvoice()">Process invoice</button>
+  <button class="secondary" onclick="loadInvoices()">Refresh invoices</button>
+  <div id="invoicesList"></div>
+
+  <label>Record payment — invoice ID</label><input id="p-invoice" placeholder="paste invoice id from list above" />
+  <label>Amount</label><input id="p-amount" type="number" step="0.01" min="0" />
+  <button onclick="recordPayment()">Record payment</button>
+  <button class="secondary" onclick="draftReminder()">Draft collection reminder</button>
+
+  <label>Cash available for supplier payments</label><input id="p-cash" type="number" step="0.01" min="0" placeholder="5000" />
+  <button onclick="paymentPlan()">Plan supplier payments</button>
+  <button class="secondary" onclick="aging()">Receivables aging</button>
+
+  <label>Ask the accounting agent</label><input id="f-question" placeholder="¿Qué clientes tienen facturas vencidas?" />
+  <button onclick="askAgent()">Ask</button>
+  <pre id="f-output"></pre>
 </section>
 
 <script>
@@ -218,8 +245,86 @@ async function generateCombo() {
   } catch (e) { out.textContent = 'Error: ' + e.message; }
 }
 
+const money = n => Number(n).toFixed(2);
+const fOut = () => document.getElementById('f-output');
+const post = (path, body) => api(path, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(body ?? {}),
+});
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+async function loadInvoices() {
+  const invoices = await api('/api/accounting/invoices');
+  document.getElementById('invoicesList').innerHTML = invoices.length
+    ? '<ul>' + invoices.map(i => `<li><code>${i.id}</code> — ${i.kind === 'payable' ? 'AP' : 'AR'} ${esc(i.counterparty)} #${esc(i.number)} · ${money(i.total)} ${i.currency} · due ${i.dueDate} · <b>${i.status}</b>${i.amountPaid ? ` (paid ${money(i.amountPaid)})` : ''}</li>`).join('') + '</ul>'
+    : '<p>No invoices yet.</p>';
+}
+
+async function processInvoice() {
+  fOut().textContent = 'Processing…';
+  try {
+    const res = await fetch('/api/accounting/invoices/process', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ kind: document.getElementById('f-kind').value, text: document.getElementById('f-text').value }),
+    });
+    const r = await res.json();
+    if (r.error) throw new Error(r.error);
+    const issues = r.issues.map(i => `  [${i.level}] ${i.message}`).join('\n') || '  none';
+    fOut().textContent = (r.saved ? `Booked invoice ${r.invoice.id}` : 'Not booked') +
+      ` (extracted by ${r.extractedBy})\nIssues:\n${issues}\n\nExtracted:\n${JSON.stringify(r.extracted, null, 2)}`;
+    loadInvoices();
+  } catch (e) { fOut().textContent = 'Error: ' + e.message; }
+}
+
+async function recordPayment() {
+  try {
+    const id = document.getElementById('p-invoice').value;
+    const inv = await post(`/api/accounting/invoices/${id}/payments`, { amount: Number(document.getElementById('p-amount').value) });
+    fOut().textContent = `Payment recorded. ${inv.number}: paid ${money(inv.amountPaid)} of ${money(inv.total)} → ${inv.status}`;
+    loadInvoices();
+  } catch (e) { fOut().textContent = 'Error: ' + e.message; }
+}
+
+async function draftReminder() {
+  fOut().textContent = 'Thinking…';
+  try {
+    const r = await post(`/api/accounting/receivables/${document.getElementById('p-invoice').value}/reminder`);
+    fOut().textContent = `Days overdue: ${r.daysOverdue}${r.loggedToContact ? ' · logged to CRM contact' : ''}\n\n${r.reminder}`;
+  } catch (e) { fOut().textContent = 'Error: ' + e.message; }
+}
+
+async function paymentPlan() {
+  fOut().textContent = 'Thinking…';
+  try {
+    const r = await post('/api/accounting/payables/payment-plan', { cashAvailable: Number(document.getElementById('p-cash').value) });
+    const lines = r.lines.map(l => `  ${l.supplier} #${l.number} · due ${l.dueDate} (${l.daysUntilDue}d) · balance ${money(l.balance)} → pay ${money(l.payNow)}`).join('\n');
+    fOut().textContent = `Outstanding ${money(r.totalOutstanding)} · pay now ${money(r.totalToPay)} · cash left ${money(r.cashLeft)}\n` +
+      (r.warnings.length ? `Warnings: ${r.warnings.join('; ')}\n` : '') + `\n${lines}\n\n${r.recommendation}`;
+  } catch (e) { fOut().textContent = 'Error: ' + e.message; }
+}
+
+async function aging() {
+  try {
+    const r = await api('/api/accounting/receivables/aging');
+    const totals = Object.entries(r.totals).map(([cur, b]) => `  ${cur}: ` + Object.entries(b).map(([k, v]) => `${k} ${money(v)}`).join(' · ')).join('\n');
+    const customers = r.byCustomer.map(c => `  ${c.customer}: ${money(c.balance)} ${c.currency} (oldest ${c.oldestDaysOverdue}d overdue)`).join('\n');
+    fOut().textContent = `Receivables aging as of ${r.asOf}\n${totals || '  nothing outstanding'}\n\nBy customer:\n${customers}`;
+  } catch (e) { fOut().textContent = 'Error: ' + e.message; }
+}
+
+async function askAgent() {
+  fOut().textContent = 'Thinking…';
+  try {
+    const r = await post('/api/accounting/ask', { question: document.getElementById('f-question').value });
+    fOut().textContent = r.answer;
+  } catch (e) { fOut().textContent = 'Error: ' + e.message; }
+}
+
 loadMode();
 loadContacts();
+loadInvoices();
 </script>
 </body>
 </html>
