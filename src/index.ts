@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { contactsRouter } from "./routes/contacts.js";
 import { skillsRouter } from "./routes/skills.js";
+import { projectsRouter } from "./routes/projects.js";
 import { isLiveMode } from "./claudeClient.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -16,6 +17,7 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/contacts", contactsRouter);
+app.use("/api/projects", projectsRouter);
 app.use("/api/skills", skillsRouter);
 
 const PORT = Number(process.env.PORT ?? 3000);

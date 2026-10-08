@@ -76,11 +76,53 @@
   #contactsList { font-size: 0.9rem; margin-top: 0.75rem; }
   #contactsList ul { padding-left: 1.1rem; margin: 0; }
   #contactsList code { font-size: 0.8rem; color: var(--muted); }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0 0.75rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 0.75rem; }
+  th, td { text-align: left; padding: 0.35rem 0.4rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .health { font-weight: 600; white-space: nowrap; }
+  .health-off-track { color: #d93a3a; }
+  .health-at-risk { color: #c98a00; }
+  .health-on-track, .health-live { color: #1f9d55; }
+  #projectDetail ul { padding-left: 1.1rem; margin: 0.4rem 0; font-size: 0.88rem; }
+  #projectDetail button { margin: 0 0 0 0.4rem; padding: 0.1rem 0.5rem; font-size: 0.8rem; }
 </style>
 </head>
 <body>
 <h1>ClaudeEO</h1>
-<p class="subtitle">Auto CRM · WhatsApp Agent Kit · Claude Ads · Combo Marketing — <span id="mode">checking mode…</span></p>
+<p class="subtitle">Auto CRM · WhatsApp Agent Kit · Claude Ads · Combo Marketing · PM Ops — <span id="mode">checking mode…</span></p>
+
+<section>
+  <h2>PM Ops — Turnkey client projects</h2>
+  <div class="row">
+    <div><label>Client</label><input id="p-client" placeholder="Acme Dental" /></div>
+    <div><label>Type</label>
+      <select id="p-type">
+        <option value="new-client">new-client (turnkey)</option>
+        <option value="new-integration">new-integration</option>
+        <option value="expansion">expansion</option>
+      </select>
+    </div>
+    <div><label>PM owner</label><input id="p-owner" placeholder="Erick" /></div>
+    <div><label>Kickoff date</label><input id="p-kickoff" type="date" /></div>
+  </div>
+  <label>Integrations (comma-separated, optional)</label><input id="p-integrations" placeholder="WhatsApp Business, Stripe, Shopify" />
+  <button onclick="createProject()">Create project</button>
+  <button class="secondary" onclick="loadDashboard()">Refresh dashboard</button>
+  <div id="dashboard"></div>
+
+  <label>Project</label><select id="p-select" onchange="showProject()"></select>
+  <div id="projectDetail"></div>
+  <label>Report audience</label>
+  <select id="p-audience"><option value="internal">internal</option><option value="client">client</option></select>
+  <button onclick="statusReport()">Status report</button>
+  <button class="secondary" onclick="portfolioDigest()">Portfolio digest</button>
+  <pre id="p-output"></pre>
+
+  <label>New client intake notes → requirements brief</label>
+  <textarea id="i-notes" rows="3" placeholder="Paste sales/kickoff notes: what they sell, systems they use, deadlines…"></textarea>
+  <button onclick="intake()">Analyze intake</button>
+  <pre id="i-output"></pre>
+</section>
 
 <section>
   <h2>Auto CRM — Contacts</h2>
@@ -218,8 +260,104 @@ async function generateCombo() {
   } catch (e) { out.textContent = 'Error: ' + e.message; }
 }
 
+const json = (body) => ({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+const patch = (body) => ({ ...json(body), method: 'PATCH' });
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+async function loadDashboard() {
+  const d = await api('/api/projects/dashboard');
+  const select = document.getElementById('p-select');
+  const selected = select.value;
+  select.innerHTML = d.projects.map(h => `<option value="${h.projectId}">${esc(h.clientName)}</option>`).join('');
+  if (selected) select.value = selected;
+  document.getElementById('dashboard').innerHTML = d.projects.length
+    ? `<table><tr><th>Client</th><th>Health</th><th>Phase</th><th>Progress</th><th>Go-live</th><th>Why</th></tr>` +
+      d.projects.map(h => `<tr><td>${esc(h.clientName)}<br><code>${h.type}</code></td>` +
+        `<td class="health health-${h.health}">${h.health}</td><td>${esc(h.currentPhase?.label ?? '—')}</td>` +
+        `<td>${h.percentComplete}%</td><td>${h.targetGoLive}<br>(${h.daysToGoLive}d)</td><td>${esc(h.reasons.join('; '))}</td></tr>`).join('') +
+      `</table>`
+    : '<p>No projects yet.</p>';
+  showProject();
+}
+
+async function createProject() {
+  const integrations = document.getElementById('p-integrations').value
+    .split(',').map(s => s.trim()).filter(Boolean).map(name => ({ name }));
+  try {
+    await api('/api/projects', json({
+      clientName: document.getElementById('p-client').value,
+      type: document.getElementById('p-type').value,
+      owner: document.getElementById('p-owner').value || undefined,
+      kickoffDate: document.getElementById('p-kickoff').value || undefined,
+      integrations,
+    }));
+    loadDashboard();
+  } catch (e) { document.getElementById('p-output').textContent = 'Error: ' + e.message; }
+}
+
+async function showProject() {
+  const id = document.getElementById('p-select').value;
+  const el = document.getElementById('projectDetail');
+  if (!id) { el.innerHTML = ''; return; }
+  const p = await api('/api/projects/' + id);
+  const next = p.health.nextActions.map(t =>
+    `<li>[${t.phase}] ${esc(t.title)} — due ${t.dueDate} (${t.status})` +
+    `<button class="secondary" onclick="setTask('${id}','${t.id}','done')">done</button>` +
+    `<button class="secondary" onclick="setTask('${id}','${t.id}','blocked')">blocked</button></li>`).join('');
+  const integrations = p.integrations.map(i =>
+    `<li>${esc(i.name)} — ${i.status}` +
+    ['in-progress', 'testing', 'live', 'blocked'].map(s =>
+      `<button class="secondary" onclick="setIntegration('${id}','${i.id}','${s}')">${s}</button>`).join('') + `</li>`).join('');
+  el.innerHTML = `<strong>Next actions</strong><ul>${next || '<li>All done</li>'}</ul>` +
+    `<strong>Integrations</strong><ul>${integrations || '<li>None</li>'}</ul>`;
+}
+
+async function setTask(projectId, taskId, status) {
+  const body = { status };
+  if (status === 'blocked') body.blocker = prompt('What is blocking it?') || undefined;
+  await api(`/api/projects/${projectId}/tasks/${taskId}`, patch(body));
+  loadDashboard();
+}
+
+async function setIntegration(projectId, integrationId, status) {
+  await api(`/api/projects/${projectId}/integrations/${integrationId}`, patch({ status }));
+  loadDashboard();
+}
+
+async function statusReport() {
+  const out = document.getElementById('p-output');
+  out.textContent = 'Thinking…';
+  try {
+    const r = await api('/api/skills/pm-status-report', json({
+      projectId: document.getElementById('p-select').value,
+      audience: document.getElementById('p-audience').value,
+    }));
+    out.textContent = r.report;
+  } catch (e) { out.textContent = 'Error: ' + e.message; }
+}
+
+async function portfolioDigest() {
+  const out = document.getElementById('p-output');
+  out.textContent = 'Thinking…';
+  try { out.textContent = (await api('/api/skills/pm-portfolio-digest', json({}))).digest; }
+  catch (e) { out.textContent = 'Error: ' + e.message; }
+}
+
+async function intake() {
+  const out = document.getElementById('i-output');
+  out.textContent = 'Thinking…';
+  try {
+    const r = await api('/api/skills/pm-intake', json({
+      clientName: document.getElementById('p-client').value || 'New client',
+      notes: document.getElementById('i-notes').value,
+    }));
+    out.textContent = r.brief;
+  } catch (e) { out.textContent = 'Error: ' + e.message; }
+}
+
 loadMode();
 loadContacts();
+loadDashboard();
 </script>
 </body>
 </html>
