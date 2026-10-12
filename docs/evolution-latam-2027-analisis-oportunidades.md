@@ -1,17 +1,18 @@
 # Evolution LATAM — Plan de crecimiento 2027
 
-**Versión 3 (octubre 2026).** Incorpora los lineamientos del Head of Sales LATAM:
+**Versión 4 (octubre 2026, post SBC Lisbon).** Incorpora los lineamientos del Head of Sales LATAM:
 - México como mercado meta, con nuevos deals +200% y tier estratégico x3.
 - Brasil fuera del plan; Caliente como opción de bajo potencial.
 - Main opportunities: Ganamos, Grupo Royal, Grupo Distra y Cirsa/Sportium.
 - Ajustes en Paraguay, Bahamas, Rep. Dominicana, Trickless, Quartzplay y MasterBet365.
 - Planes de activación y de crecimiento de las cuentas live.
+- **V4:** notas y action items de SBC Lisbon 2026; Ganamos a €5M GGR/mes al 9%; 12 oportunidades nuevas sumadas al plan.
 
 **Fuentes:** `Opportunities-2026-27072026_v3.xlsx` (Hot_Leads, Mexico, KAM Tracker), `EM PGS 2026 Sales Report`, `Mexico iGaming Evolution Strategy 2025–2027` e información comercial del equipo LATAM. El detalle por deal está en `Hot_Leads_limpio_2026-10.xlsx`.
 
 > **Convenciones**
 > - La GGR que se indica para cada operador es la generada en juegos de Evolution.
-> - El ingreso de Evolution se estima con un take rate del 11% (tramo contractual estándar en Hot_Leads).
+> - El ingreso de Evolution se estima con un take rate del 11% (tramo contractual estándar en Hot_Leads), salvo Ganamos, que se modela al 9%.
 > - Montos en EUR; los deal values en USD se convierten × 0,88.
 > - Todo lo que se refiere a 2027 es una estimación con supuestos explícitos, no un forecast contable.
 
@@ -21,12 +22,12 @@
 
 | | Conservador | **Base** | Ambicioso |
 |---|---:|---:|---:|
-| Ingreso Evolution LATAM 2027 | €6,6M | **€9,7M** | €13,0M |
-| Crecimiento vs. objetivo 2026 (€2,11M) | +214% | **+357%** | +514% |
-| Sin Grupo Ganamos | €3,3M (+58%) | **€4,7M (+123%)** | €6,4M (+201%) |
+| Ingreso Evolution LATAM 2027 | €6,1M | **€8,8M** | €11,9M |
+| Crecimiento vs. objetivo 2026 (€2,11M) | +188% | **+319%** | +464% |
+| Sin Grupo Ganamos | €3,4M (+60%) | **€4,8M (+127%)** | €6,5M (+208%) |
 
-- **El año depende de Grupo Ganamos (Argentina).** Con ~€5M de GGR mensual (€60M al año), representa ~€6,6M de ingreso Evolution anualizado y **~51% del total 2027**. Asegurar su go-live y su rampa es la prioridad número uno.
-- **Cuatro main opportunities suman ~62% del ingreso 2027:**
+- **El año depende de Grupo Ganamos (Argentina).** Con ~€5M de GGR mensual (€60M al año) al 9%, representa ~€5,4M de ingreso Evolution anualizado y **~46% del total 2027**. En SBC Lisbon el cliente pidió 8% y mencionó que Pragmatic tendría ~80% del share; hoy solo tiene Ezugi. Validar cifras y cerrar el take rate es la prioridad número uno.
+- **Cuatro main opportunities suman ~59% del ingreso 2027:**
   - Ganamos (AR): €5M de GGR al mes.
   - Grupo Royal (VE): €1,5M de GGR al mes.
   - Grupo Distra (PE): €350K de GGR al mes desde Q2 2027.
@@ -43,7 +44,7 @@
 | Componente | Conservador | Base | Ambicioso | Supuesto |
 |---|---:|---:|---:|---|
 | Base 2026 (objetivo PGS) | 2.110 | 2.110 | 2.110 | — |
-| **Grupo Ganamos (AR)** | 3.300 | 4.950 | 6.600 | €5M GGR/mes × 11% = €6,6M/año; rampa 50 / 75 / 100% |
+| **Grupo Ganamos (AR)** | 2.700 | 4.050 | 5.400 | €5M GGR/mes × 9% = €5,4M/año; rampa 50 / 75 / 100% |
 | **Grupo Royal (VE)** | 330 | 808 | 1.336 | €1,5M GGR/mes × 11%; live en Q3 / Q2 / fines de Q1 |
 | Same-store, cuentas live sin Bahamas | 184 | 369 | 553 | +10 / 20 / 30% |
 | **México**: tier estratégico × 3 | 0 | 300 | 750 | Codere, Playdoit, BetMexico, Bet365, AFun y whitespace |
@@ -56,12 +57,14 @@
 | Rep. Dominicana (Loteka + Breeze) | 16 | 25 | 35 | Breeze sale en vivo vía 3rd party |
 | Resto de etapa avanzada | 163 | 212 | 305 | Cierre del 50 / 65 / 80% |
 | Resto de propuestas y prospectos | 32 | 59 | 102 | — |
-| **Total 2027** | **6.624** | **9.650** | **12.957** | |
+| **SBC Lisbon: 9 nuevos logos** (€264K estimado) | 26 | 40 | 71 | Cierre del 20 / 30 / 45%, medio año en vivo |
+| **SBC Lisbon: upsell** Apuesta Total, Winpot, Jugamax (€101K) | 36 | 48 | 71 | 60 / 80 / 100% |
+| **Total 2027** | **6.086** | **8.838** | **11.899** | |
 
 **Sensibilidad:**
-- Cada mes de retraso de Ganamos resta ~€550K.
+- Cada mes de retraso de Ganamos resta ~€450K.
 - Cada mes de retraso de Grupo Royal resta ~€115K, y cada mes de Grupo Distra ~€29K.
-- A volúmenes de €5M de GGR mensual es probable negociar tramos de take rate menores al 11%. Cada punto menos en Ganamos resta ~€450K en el escenario base.
+- Cada punto de take rate en Ganamos vale ~€450K en el escenario base: al 8% que pide el cliente, el total baja a ~€8,4M.
 
 ---
 
@@ -97,8 +100,8 @@
 
 | Grupo | Mercado | Estado | Potencial | Siguiente paso |
 |---|---|---|---|---|
-| **Grupo Ganamos** | Argentina | Integración; legalmente listo; próximo a salir en vivo | ~€5M GGR/mes, ~€6,6M de ingreso Evo al año | Go-live en Q4 2026, plan de lanzamiento, monitoreo semanal y negociar tramos de take rate |
-| **Grupo Royal** (Apuestas Royal + GoGo Royal) | Venezuela | Apuestas Royal en DD; GoGo Royal por dar de alta | ~€1,5M GGR/mes, ~€2,0M al año | Cerrar el DD, acuerdo de grupo para ambas marcas, go-live a más tardar en Q2 |
+| **Grupo Ganamos** | Argentina | Integración; legalmente listo; próximo a salir en vivo. Pide 8%; hoy solo Ezugi | ~€5M GGR/mes, ~€5,4M de ingreso Evo al año (9%) | Validar GGR y share de Pragmatic, cerrar take rate, ampliar contenido más allá de Ezugi y go-live |
+| **Grupo Royal** (Apuestas Royal + GoGo Royal) | Venezuela | #1 en Venezuela (SBC Lisbon); contacto Daniel Nunes. Contrato y DD pendientes; GoGo Royal por dar de alta | ~€1,5M GGR/mes, ~€2,0M al año | Cerrar el DD, acuerdo de grupo para ambas marcas, go-live a más tardar en Q2 |
 | **Grupo Distra** (Bacanbet) | Perú | Legal-Evo | ~€350K GGR/mes desde Q2 2027, ~€460K al año | Desbloquear Legal (en Legal desde el 14 de septiembre) e integración en Q1 |
 | **Grupo Cirsa / Sportium** | Panamá, Colombia, México | Compliance y Legal; master agreement creado | $350K | Firmar el master agreement y desplegar en secuencia: PA, CO, MX |
 
@@ -120,7 +123,7 @@
 ### 4.3 Upselling
 
 - **Cuentas live 2026:** objetivo de +€605K (+40%). El plan por cuenta está en la sección 5.
-- **MasterBet365 (Perú):** pasó a acuerdo directo y está creciendo fuertemente. Hay que cargar su GGR en Hot_Leads y fijarle un objetivo 2027. Hoy no está cuantificada, así que es upside adicional.
+- **MasterBet365 (Perú):** opera y crece fuertemente; el contrato directo y el DD siguen pendientes en Evo Legal, con interés en integración completa con Promo Tools. Hay que cargar su GGR y fijarle un objetivo 2027. Hoy no está cuantificada, así que es upside adicional.
 - **México:** upsell de Ezugi en 17 operadores.
 - **Mesas dedicadas o branded:** Betara, Winland, Bahamas y Grupo Royal.
 
@@ -195,3 +198,65 @@
 9. Go-live de Grupo Royal (a más tardar en Q2) y de Grupo Distra (Q2).
 10. QBR mensual con las main opportunities y trimestral con las cuentas live.
 11. Al menos 2 mesas dedicadas o branded y campañas Liga MX en México.
+
+---
+
+## 8. Actualización post SBC Lisbon 2026
+
+### 8.1 Oportunidades sumadas al plan
+
+Valores estimados (las notas no traen montos): $25K por operador nuevo, que es el promedio de Hot_Leads, y $35–50K para plataformas o grupos multi-marca. **Todos están por confirmar.**
+
+| Cuenta | Mercado | Tipo | Valor estimado | Situación (SBC Lisbon) |
+|---|---|---|---:|---|
+| Zenit | LATAM | Nuevo logo (acuerdo directo) | $50K | Busca acuerdo directo para expandirse en LATAM |
+| Betstarters | LATAM (plataforma) | Nuevo logo | $40K | Plataforma de Tinbet; fee de integración EUR 5.000 |
+| VirtualSoft | LATAM (plataforma) | Nuevo logo | $40K | Ruleta personalizada a cambio de posicionamiento de slots, Live y Ezugi; sin setup ni OPEX |
+| Olimpobet | Por confirmar | Nuevo logo | $35K | Ruleta personalizada multi-marca; CAPEX parcial a cargo del cliente; Game Shows desactivados |
+| GameMedia / Betzar / Marga | Perú | Nuevo logo | $35K | Sin setup a cambio de exclusividad Live, slots destacados y marketing; sin mínimo 12 meses |
+| BRBet | El Salvador | Nuevo logo | $25K | Expansión a El Salvador; contacto con el regulador |
+| Bet n Play | Venezuela | Nuevo logo | $25K | Relación directa y agregador Dallas |
+| RumbaWin | Venezuela | Nuevo logo | $25K | Pipeline Venezuela |
+| Juegatelo.com | Venezuela | Nuevo logo | $25K | Pipeline Venezuela |
+| Apuesta Total | Perú | Upsell (cliente #1 de Perú) | $50K | Expansión omnicanal; pendientes mesas, deuda, lanzamiento y marketing |
+| Winpot | México → Perú | Upsell | $50K | Nueva mesa dedicada, nuevas marcas y entrada a Perú con entidad lista |
+| Jugamax | Por confirmar | Upsell | $15K | Suite de promociones; pendientes ruletas y microlímites |
+| **Total** | | | **$415K (€365K)** | Aporte 2027: €62K / €88K / €142K (conservador / base / ambicioso) |
+
+**Venezuela** pasa a ser el segundo mercado del plan: Grupo Royal (€2,0M al año) más Bet n Play, RumbaWin y Juegatelo.
+
+### 8.2 Condiciones comerciales a cerrar
+
+| Cuenta | Condición conversada | Por confirmar |
+|---|---|---|
+| Ganamos | Pide 8%; Pragmatic ~80% del share; hoy solo Ezugi | Período del GGR (USD 60M), base del 8%, alcance de contenido |
+| Palmsbet (Chroma) | CAPEX 7.500; OPEX reducido o exonerado por un período | Moneda y período |
+| Bet4win | Setup de 1.000 (50% en bonos); mínimo de 3.500 exonerado 12 meses; promos vía API | Moneda y aplicación del crédito |
+| Betstarters | Fee de integración EUR 5.000 | Alcance e hitos |
+| VirtualSoft / Olimpobet | Ruleta personalizada a cambio de posiciones y marketing | Reparto de CAPEX/OPEX, posiciones y duración |
+| GameMedia / Betzar | Sin setup ni mínimo 12 meses a cambio de exclusividad Live | Entidades y contacto |
+
+### 8.3 Action items priorizados
+
+**Prioridad 1: contratos, lanzamientos y pendientes financieros**
+- MasterBet365: contrato, DD e integración con Promo Tools.
+- Apuestas Royal: contrato y DD con Daniel Nunes; integración directa.
+- Betsolute: fecha de lanzamiento en Colombia.
+- Tinbet: despliegue de Promo Tools.
+- Apuesta Total: deuda y lanzamiento de mesas.
+- Groove / Tucanbit: nota de crédito.
+
+**Prioridad 2: propuestas y activación comercial**
+- Palmsbet / Chroma, Betstarters, Jugamax, Bet4win, VirtualSoft, Olimpobet, GameMedia/Betzar, Betboom (Maite).
+- Ganamos: validar cifras y take rate.
+
+**Prioridad 3: expansión**
+- Winpot (mesa dedicada y Perú), BRBet (El Salvador), Zenit, Torrero, Bet n Play, Betsolute regional, Apuesta Total omnicanal.
+
+El tracker completo, con responsable y estado de cada acción, está en la pestaña *Action items SBC Lisbon* del Excel.
+
+### 8.4 Market intelligence (por validar)
+
+- **Perú:** 42 licencias de casino; el mercado se comprime y los operadores pequeños ganan participación. Falta validar fecha, fuente y tipo de licencia.
+- **El Salvador:** 10 licenciatarios, licencia de 100.000, 10% sobre GGR y aceptación de cripto. Falta confirmar moneda, periodicidad y base tributaria.
+- **Venezuela:** RumbaWin, Juegatelo.com, Apuestas Royal y Bet n Play. Hay que consolidar contactos, plataforma y estado contractual de cada uno.
