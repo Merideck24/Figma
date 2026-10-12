@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Panel PM Ops</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    color-scheme: light;
+    --surface-0: #f4f4f2;
+    --surface-1: #fcfcfb;
+    --surface-2: #f0efec;
+    --border: #e2e1dc;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #7a7974;
+    --accent: #6d5ef0;
+    --accent-text: #ffffff;
+    /* Status palette — always paired with an icon + label. */
+    --good: #0ca30c;
+    --warning: #fab219;
+    --serious: #ec835a;
+    --critical: #d03b3b;
+    /* Ordinal blue ramp for in-flight integration stages. */
+    --stage-1: #86b6ef;
+    --stage-2: #2a78d6;
+    --stage-3: #184f95;
+    --track: #cde2fb;
+    --neutral: #b8b7b1;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-0: #121211;
+      --surface-1: #1a1a19;
+      --surface-2: #242422;
+      --border: #383835;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #8f8e86;
+      --stage-1: #3987e5;
+      --stage-2: #6da7ec;
+      --stage-3: #b7d3f6;
+      --track: #184f95;
+      --neutral: #5d5c57;
+      --shadow: none;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-0: #121211;
+    --surface-1: #1a1a19;
+    --surface-2: #242422;
+    --border: #383835;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #8f8e86;
+    --stage-1: #3987e5;
+    --stage-2: #6da7ec;
+    --stage-3: #b7d3f6;
+    --track: #184f95;
+    --neutral: #5d5c57;
+    --shadow: none;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--surface-0);
+    color: var(--text-primary);
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 20px 16px 48px; }
+
+  header.top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 16px; }
+  header.top h1 { margin: 0; font-size: 22px; letter-spacing: -0.01em; }
+  header.top .meta { color: var(--text-muted); font-size: 13px; }
+  header.top .spacer { flex: 1; }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  select, input, button, textarea {
+    font: inherit;
+    color: inherit;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+  button { cursor: pointer; }
+  button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); font-weight: 600; }
+  button:hover { filter: brightness(1.05); }
+
+  .card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+  }
+  .panel { padding: 16px; margin-bottom: 16px; }
+  .panel h2 { margin: 0 0 12px; font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+
+  /* KPI tiles */
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .kpi { padding: 14px 16px; }
+  .kpi .label { color: var(--text-secondary); font-size: 13px; }
+  .kpi .value { font-size: 28px; font-weight: 600; margin-top: 2px; }
+  .kpi.hero .value { font-size: 48px; line-height: 1.05; }
+  .kpi .sub { color: var(--text-muted); font-size: 12px; margin-top: 2px; }
+
+  /* Status badges: icon + label + color, never color alone */
+  .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--text-primary); }
+  .badge .dot { width: 14px; height: 14px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 9px; color: #fff; flex: none; }
+  .h-off-track .dot { background: var(--critical); }
+  .h-at-risk .dot { background: var(--warning); color: #3a2a00; }
+  .h-on-track .dot, .h-live .dot { background: var(--good); }
+  .h-on-hold .dot, .h-cancelled .dot { background: var(--neutral); }
+
+  /* Board */
+  .board { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(240px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 6px; }
+  .col { background: var(--surface-2); border-radius: 10px; padding: 10px; min-height: 120px; }
+  .col h3 { margin: 0 0 8px; font-size: 13px; display: flex; justify-content: space-between; color: var(--text-secondary); }
+  .pcard { padding: 10px 12px; margin-bottom: 8px; cursor: pointer; border-left: 4px solid var(--neutral); }
+  .pcard.h-off-track { border-left-color: var(--critical); }
+  .pcard.h-at-risk { border-left-color: var(--warning); }
+  .pcard.h-on-track, .pcard.h-live { border-left-color: var(--good); }
+  .pcard:hover { border-color: var(--accent); }
+  .pcard .name { font-weight: 600; }
+  .pcard .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 12px; margin-top: 6px; }
+  .pcard .row > span:last-child { white-space: nowrap; }
+  .pcard .why { color: var(--text-secondary); font-size: 12px; margin-top: 6px; }
+  .meter { height: 6px; border-radius: 3px; background: var(--track); overflow: hidden; margin-top: 8px; }
+  .meter > span { display: block; height: 100%; background: var(--stage-2); border-radius: 3px; }
+  .empty { color: var(--text-muted); font-size: 13px; }
+
+  /* Timeline */
+  .grid2 { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; }
+  @media (max-width: 900px) { .grid2 { grid-template-columns: 1fr; } }
+  .tl { position: relative; }
+  .tl-row { display: grid; grid-template-columns: minmax(80px, 140px) 1fr; align-items: center; gap: 8px; height: 30px; }
+  .tl-row .who { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
+  .tl-track { position: relative; height: 100%; }
+  .tl-bar { position: absolute; top: 9px; height: 12px; border-radius: 4px; background: var(--track); cursor: pointer; }
+  .tl-bar > span { display: block; height: 100%; border-radius: 4px; background: var(--stage-2); }
+  .tl-bar.h-off-track > span { background: var(--critical); }
+  .tl-bar.h-at-risk > span { background: var(--warning); }
+  .tl-bar.h-live > span { background: var(--good); }
+  .tl-today { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); pointer-events: none; }
+  .tl-today-label { position: absolute; top: -18px; transform: translateX(-50%); font-size: 11px; color: var(--accent); font-weight: 600; }
+  .tl-axis { display: grid; grid-template-columns: minmax(80px, 140px) 1fr; gap: 8px; margin-top: 4px; }
+  .tl-axis .ticks { position: relative; height: 16px; color: var(--text-muted); font-size: 11px; }
+  .tl-axis .ticks span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+
+  /* Integrations */
+  .stack { display: flex; height: 14px; gap: 2px; margin: 4px 0 10px; }
+  .stack > span { border-radius: 4px; min-width: 4px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; }
+  .legend i, .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  .s-requested { background: var(--neutral); }
+  .s-in-progress { background: var(--stage-1); }
+  .s-testing { background: var(--stage-3); }
+  .s-live { background: var(--good); }
+  .s-blocked { background: var(--critical); }
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 6px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--text-secondary); font-weight: 600; font-size: 12px; }
+  td.num { font-variant-numeric: tabular-nums; }
+
+  /* Tooltip */
+  #tip {
+    position: fixed; pointer-events: none; z-index: 20; display: none;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.12); max-width: 260px;
+  }
+
+  /* Drawer */
+  #drawer { position: fixed; inset: 0; display: none; z-index: 10; }
+  #drawer.open { display: block; }
+  #drawer .scrim { position: absolute; inset: 0; background: rgba(0,0,0,0.35); }
+  #drawer .sheet {
+    position: absolute; top: 0; right: 0; bottom: 0; width: min(560px, 100%);
+    background: var(--surface-1); overflow-y: auto; padding: 20px 20px 40px;
+    border-left: 1px solid var(--border);
+  }
+  .sheet h2 { margin: 0; font-size: 20px; }
+  .sheet h4 { margin: 18px 0 6px; font-size: 13px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+  .task { display: flex; gap: 8px; align-items: flex-start; padding: 4px 0; font-size: 13px; }
+  .task input { margin-top: 3px; padding: 0; }
+  .task.done .t { color: var(--text-muted); text-decoration: line-through; }
+  .task .due { color: var(--text-muted); font-size: 12px; white-space: nowrap; }
+  .task .due.late { color: var(--critical); font-weight: 600; }
+  .task .blk { color: var(--critical); font-size: 12px; }
+  .task button { padding: 0 6px; font-size: 11px; margin-left: auto; }
+  .integ { display: flex; gap: 8px; align-items: center; padding: 4px 0; }
+  .integ .n { flex: 1; }
+  .log { font-size: 12px; color: var(--text-secondary); }
+  .log div { padding: 2px 0; }
+  pre.report { white-space: pre-wrap; background: var(--surface-2); padding: 10px; border-radius: 8px; font-size: 12px; }
+  .close { float: right; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Panel de seguimiento · PM Ops</h1>
+    <span class="meta" id="asOf">Cargando…</span>
+    <span class="spacer"></span>
+    <a href="/">← Volver a ClaudeEO</a>
+  </header>
+
+  <div class="filters">
+    <select id="f-owner" aria-label="Responsable"><option value="">Todos los responsables</option></select>
+    <select id="f-type" aria-label="Tipo">
+      <option value="">Todos los tipos</option>
+      <option value="new-client">Cliente nuevo (Turnkey)</option>
+      <option value="new-integration">Integración nueva</option>
+      <option value="expansion">Expansión</option>
+    </select>
+    <select id="f-health" aria-label="Salud">
+      <option value="">Toda la salud</option>
+      <option value="off-track">Fuera de ruta</option>
+      <option value="at-risk">En riesgo</option>
+      <option value="on-track">En ruta</option>
+      <option value="live">En línea</option>
+      <option value="on-hold">En pausa</option>
+    </select>
+    <input id="f-q" placeholder="Buscar cliente…" aria-label="Buscar cliente" />
+    <button id="digestBtn">Resumen del portafolio (IA)</button>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <section class="card panel">
+    <h2>Tablero por fase</h2>
+    <div class="board" id="board"></div>
+  </section>
+
+  <div class="grid2">
+    <section class="card panel">
+      <h2>Línea de tiempo · kickoff → go-live</h2>
+      <div class="tl" id="timeline"></div>
+    </section>
+    <section class="card panel">
+      <h2>Pipeline de integraciones</h2>
+      <div id="integrations"></div>
+    </section>
+  </div>
+
+  <section class="card panel">
+    <h2>Acciones prioritarias</h2>
+    <div id="actions"></div>
+  </section>
+
+  <section class="card panel" id="digestPanel" hidden>
+    <h2>Resumen del portafolio</h2>
+    <pre class="report" id="digest"></pre>
+  </section>
+</div>
+
+<div id="tip"></div>
+
+<div id="drawer" aria-hidden="true">
+  <div class="scrim" onclick="closeDrawer()"></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+</div>
+
+<script>
+const HEALTH = {
+  'off-track': { label: 'Fuera de ruta', icon: '!' },
+  'at-risk':   { label: 'En riesgo', icon: '!' },
+  'on-track':  { label: 'En ruta', icon: '✓' },
+  'live':      { label: 'En línea', icon: '✓' },
+  'on-hold':   { label: 'En pausa', icon: 'Ⅱ' },
+  'cancelled': { label: 'Cancelado', icon: '×' },
+};
+const TYPE_LABEL = { 'new-client': 'Turnkey', 'new-integration': 'Integración', 'expansion': 'Expansión' };
+const INTEG = [
+  ['requested', 'Solicitada'],
+  ['in-progress', 'En progreso'],
+  ['testing', 'En pruebas'],
+  ['live', 'En vivo'],
+  ['blocked', 'Bloqueada'],
+];
+const INTEG_LABEL = Object.fromEntries(INTEG);
+
+let state = { projects: [], dashboard: null, playbook: null, openId: null };
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const badge = (h) => `<span class="badge h-${h}"><span class="dot">${HEALTH[h].icon}</span>${HEALTH[h].label}</span>`;
+const fmtDate = (d) => new Date(d + 'T00:00:00Z').toLocaleDateString('es', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+const dayMs = 86400000;
+const toMs = (d) => Date.parse(d + 'T00:00:00Z');
+
+async function api(path, opts) {
+  const res = await fetch(path, opts);
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || res.statusText);
+  return res.status === 204 ? null : res.json();
+}
+const send = (method, body) => ({ method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+
+async function load() {
+  const [projects, dashboard, playbook] = await Promise.all([
+    api('/api/projects'), api('/api/projects/dashboard'), state.playbook ?? api('/api/projects/playbook'),
+  ]);
+  Object.assign(state, { projects, dashboard, playbook });
+  const owners = [...new Set(projects.map((p) => p.owner).filter(Boolean))].sort();
+  const sel = $('f-owner'), cur = sel.value;
+  sel.innerHTML = '<option value="">Todos los responsables</option>' + owners.map((o) => `<option>${esc(o)}</option>`).join('');
+  sel.value = cur;
+  $('asOf').textContent = `Actualizado ${new Date().toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })} · se refresca cada 30 s`;
+  render();
+  if (state.openId) renderDrawer();
+}
+
+function filtered() {
+  const owner = $('f-owner').value, type = $('f-type').value, health = $('f-health').value, q = $('f-q').value.trim().toLowerCase();
+  return state.projects.filter((p) =>
+    (!owner || p.owner === owner) && (!type || p.type === type) &&
+    (!health || p.health.health === health) && (!q || p.clientName.toLowerCase().includes(q)));
+}
+
+function render() {
+  const list = filtered();
+  renderKpis(list);
+  renderBoard(list);
+  renderTimeline(list);
+  renderIntegrations(list);
+  renderActions(list);
+}
+
+function renderKpis(list) {
+  const active = list.filter((p) => p.status === 'active');
+  const count = (h) => active.filter((p) => p.health.health === h).length;
+  const soon = active.filter((p) => p.health.daysToGoLive >= 0 && p.health.daysToGoLive <= 7).length;
+  const integs = list.flatMap((p) => p.integrations);
+  const blocked = integs.filter((i) => i.status === 'blocked').length;
+  const ids = new Set(list.map((p) => p.clientName));
+  const ttl = (state.dashboard?.timeToLive ?? []).filter((t) => ids.has(t.clientName));
+  const avg = ttl.length ? Math.round(ttl.reduce((s, t) => s + t.days, 0) / ttl.length) : null;
+
+  $('kpis').innerHTML = [
+    ['hero', 'Proyectos activos', active.length, `${list.filter((p) => p.status === 'live').length} ya en línea`],
+    ['', 'Fuera de ruta', count('off-track'), 'requieren acción hoy', 'off-track'],
+    ['', 'En riesgo', count('at-risk'), 'vigilar esta semana', 'at-risk'],
+    ['', 'Go-lives ≤ 7 días', soon, 'próximos lanzamientos'],
+    ['', 'Integraciones bloqueadas', blocked, `de ${integs.length} en total`, blocked ? 'off-track' : null],
+    ['', 'Días promedio a en línea', avg ?? '—', ttl.length ? `${ttl.length} cliente(s) lanzados · meta 14` : 'sin lanzamientos aún'],
+  ].map(([cls, label, value, sub, h]) => `
+    <div class="card kpi ${cls}">
+      <div class="label">${h ? `<span class="badge h-${h}"><span class="dot">${HEALTH[h].icon}</span></span> ` : ''}${label}</div>
+      <div class="value">${value}</div>
+      <div class="sub">${sub}</div>
+    </div>`).join('');
+}
+
+function renderBoard(list) {
+  const phases = state.playbook.phases;
+  const cols = phases.map((ph) => ({ key: ph.key, label: phaseLabel(ph.key), items: [] }));
+  cols.push({ key: '__live', label: 'En línea', items: [] });
+  for (const p of list) {
+    if (p.status === 'cancelled') continue;
+    const key = p.status === 'live' ? '__live' : p.health.currentPhase?.key ?? 'hypercare';
+    (cols.find((c) => c.key === key) ?? cols[cols.length - 1]).items.push(p);
+  }
+  const order = ['off-track', 'at-risk', 'on-track', 'on-hold', 'live'];
+  $('board').innerHTML = cols.map((c) => `
+    <div class="col">
+      <h3><span>${esc(c.label)}</span><span>${c.items.length}</span></h3>
+      ${c.items.sort((a, b) => order.indexOf(a.health.health) - order.indexOf(b.health.health) || a.health.daysToGoLive - b.health.daysToGoLive)
+        .map(cardHtml).join('') || '<div class="empty">—</div>'}
+    </div>`).join('');
+}
+
+function cardHtml(p) {
+  const h = p.health;
+  const days = h.daysToGoLive;
+  const when = p.status === 'live' ? 'En línea' : days < 0 ? `Go-live vencido hace ${-days} d` : days === 0 ? 'Go-live hoy' : `Go-live en ${days} d`;
+  return `<div class="card pcard h-${h.health}" onclick="openDrawer('${p.id}')">
+    <div class="name">${esc(p.clientName)}</div>
+    <div class="row"><span>${TYPE_LABEL[p.type]} · ${esc(p.owner ?? 'sin responsable')}</span>${badge(h.health)}</div>
+    <div class="meter" role="img" aria-label="${h.percentComplete}% completado"><span style="width:${h.percentComplete}%"></span></div>
+    <div class="row"><span>${h.percentComplete}% completado</span><span>${when}</span></div>
+    ${reasons(p).length ? `<div class="why">${esc(reasons(p).join(' · '))}</div>` : ''}
+  </div>`;
+}
+
+function renderTimeline(list) {
+  const rows = list.filter((p) => p.status !== 'cancelled').sort((a, b) => a.targetGoLive.localeCompare(b.targetGoLive));
+  if (!rows.length) { $('timeline').innerHTML = '<div class="empty">Sin proyectos.</div>'; return; }
+  const today = new Date().toISOString().slice(0, 10);
+  let min = Math.min(toMs(today), ...rows.map((p) => toMs(p.kickoffDate))) - dayMs;
+  let max = Math.max(toMs(today), ...rows.map((p) => toMs(p.targetGoLive))) + 2 * dayMs;
+  const pct = (ms) => ((ms - min) / (max - min)) * 100;
+  const todayPct = pct(toMs(today));
+
+  const span = Math.round((max - min) / dayMs);
+  // Keep ~70px between tick labels so they never collide on narrow screens.
+  const trackWidth = Math.max(120, $('timeline').clientWidth - 148);
+  const maxTicks = Math.max(2, Math.floor(trackWidth / 70));
+  const step = [1, 2, 3, 7, 14, 30].find((d) => span / d <= maxTicks) ?? 30;
+  const ticks = [];
+  for (let t = min + dayMs; t < max; t += step * dayMs) ticks.push(t);
+
+  $('timeline').innerHTML = rows.map((p) => {
+    const l = pct(toMs(p.kickoffDate)), r = pct(toMs(p.targetGoLive));
+    return `<div class="tl-row">
+      <div class="who" title="${esc(p.clientName)}">${esc(p.clientName)}</div>
+      <div class="tl-track">
+        <div class="tl-bar h-${p.health.health}" style="left:${l}%;width:${Math.max(r - l, 1)}%"
+             data-tip="${esc(p.id)}" onclick="openDrawer('${p.id}')">
+          <span style="width:${p.health.percentComplete}%"></span>
+        </div>
+      </div>
+    </div>`;
+  }).join('') + `
+    <div class="tl-axis"><div></div><div class="ticks">${ticks.map((t) => `<span style="left:${pct(t)}%">${fmtDate(new Date(t).toISOString().slice(0, 10))}</span>`).join('')}</div></div>`;
+
+  // Today marker spans the track column only.
+  const tracks = $('timeline').querySelectorAll('.tl-track');
+  tracks.forEach((t, i) => {
+    const line = document.createElement('div');
+    line.className = 'tl-today';
+    line.style.left = todayPct + '%';
+    t.appendChild(line);
+    if (i === 0) {
+      const lab = document.createElement('div');
+      lab.className = 'tl-today-label';
+      lab.style.left = todayPct + '%';
+      lab.textContent = 'Hoy';
+      t.appendChild(lab);
+    }
+  });
+  $('timeline').style.paddingTop = '18px';
+  $('timeline').querySelectorAll('[data-tip]').forEach((el) => {
+    const p = state.projects.find((x) => x.id === el.dataset.tip);
+    attachTip(el, () => `<strong>${esc(p.clientName)}</strong><br>${badge(p.health.health)}<br>
+      Kickoff ${fmtDate(p.kickoffDate)} → go-live ${fmtDate(p.targetGoLive)}<br>
+      ${p.health.percentComplete}% · fase: ${esc(p.health.currentPhase ? phaseLabel(p.health.currentPhase.key) : '—')}`);
+  });
+}
+
+function renderIntegrations(list) {
+  const rows = list.flatMap((p) => p.integrations.map((i) => ({ ...i, project: p })));
+  if (!rows.length) { $('integrations').innerHTML = '<div class="empty">Sin integraciones registradas.</div>'; return; }
+  const counts = Object.fromEntries(INTEG.map(([k]) => [k, rows.filter((r) => r.status === k).length]));
+  const order = ['blocked', 'requested', 'in-progress', 'testing', 'live'];
+  rows.sort((a, b) => order.indexOf(a.status) - order.indexOf(b.status) || a.updatedAt.localeCompare(b.updatedAt));
+  const now = Date.now();
+  $('integrations').innerHTML = `
+    <div class="stack" role="img" aria-label="${INTEG.map(([k, l]) => `${l}: ${counts[k]}`).join(', ')}">
+      ${INTEG.filter(([k]) => counts[k]).map(([k, l]) => `<span class="s-${k}" style="flex:${counts[k]}" data-t="${l}: ${counts[k]}"></span>`).join('')}
+    </div>
+    <div class="legend">${INTEG.map(([k, l]) => `<span><i class="s-${k}"></i>${l} ${counts[k]}</span>`).join('')}</div>
+    <div class="scroll"><table>
+      <tr><th>Integración</th><th>Cliente</th><th>Estado</th><th>Sin cambio</th></tr>
+      ${rows.map((r) => `<tr>
+        <td>${esc(r.name)}${r.notes ? `<br><span style="color:var(--text-muted);font-size:12px">${esc(r.notes)}</span>` : ''}</td>
+        <td><a href="#" onclick="openDrawer('${r.project.id}');return false">${esc(r.project.clientName)}</a></td>
+        <td><span class="sw s-${r.status}"></span>${INTEG_LABEL[r.status]}</td>
+        <td class="num">${Math.floor((now - Date.parse(r.updatedAt)) / dayMs)} d</td>
+      </tr>`).join('')}
+    </table></div>`;
+  $('integrations').querySelectorAll('[data-t]').forEach((el) => attachTip(el, () => esc(el.dataset.t)));
+}
+
+function renderActions(list) {
+  const today = new Date().toISOString().slice(0, 10);
+  const items = list.filter((p) => p.status === 'active').flatMap((p) =>
+    p.tasks.filter((t) => t.status !== 'done').map((t) => ({ ...t, project: p })));
+  items.sort((a, b) => (b.status === 'blocked') - (a.status === 'blocked') || a.dueDate.localeCompare(b.dueDate));
+  const top = items.slice(0, 12);
+  $('actions').innerHTML = top.length ? `<div class="scroll"><table style="min-width:640px">
+    <tr><th>Tarea</th><th>Cliente</th><th>Fase</th><th>Responsable</th><th>Vence</th><th></th></tr>
+    ${top.map((t) => `<tr>
+      <td>${t.status === 'blocked' ? `<span class="badge h-off-track"><span class="dot">!</span>Bloqueada</span> ` : ''}${esc(t.title)}
+        ${t.blocker ? `<br><span class="blk" style="color:var(--critical);font-size:12px">${esc(t.blocker)}</span>` : ''}</td>
+      <td><a href="#" onclick="openDrawer('${t.project.id}');return false">${esc(t.project.clientName)}</a></td>
+      <td>${esc(phaseLabel(t.phase))}</td>
+      <td>${esc(t.owner ?? '—')}</td>
+      <td class="num" style="${t.dueDate < today ? 'color:var(--critical);font-weight:600' : ''}">${fmtDate(t.dueDate)}${t.dueDate < today ? ' · vencida' : ''}</td>
+      <td><button onclick="setTask('${t.project.id}','${t.id}','done')">Hecha</button></td>
+    </tr>`).join('')}
+  </table></div>` : '<div class="empty">Nada pendiente. 🎉</div>';
+}
+
+const PHASE_ES = {
+  kickoff: 'Kickoff y onboarding', requirements: 'Requerimientos', design: 'Diseño', setup: 'Setup y configuración',
+  integrations: 'Integraciones', qa: 'QA y UAT', 'go-live': 'Go-live', hypercare: 'Hypercare',
+};
+const phaseLabel = (k) => PHASE_ES[k] ?? state.playbook.phases.find((p) => p.key === k)?.label ?? k;
+
+/** Spanish "why" line built from the computed health facts. */
+function reasons(p) {
+  const h = p.health, out = [];
+  if (p.status !== 'active') return out;
+  if (h.blockedTasks.length) out.push(`${h.blockedTasks.length} tarea(s) bloqueada(s)`);
+  if (h.blockedIntegrations.length) out.push(`${h.blockedIntegrations.length} integración(es) bloqueada(s)`);
+  if (h.overdueTasks.length) out.push(`${h.overdueTasks.length} tarea(s) vencida(s)`);
+  if (h.daysToGoLive < 0 && h.percentComplete < 100) out.push(`go-live vencido hace ${-h.daysToGoLive} d`);
+  else if (h.daysToGoLive <= 3 && h.pendingIntegrations.length) out.push(`${h.pendingIntegrations.length} integración(es) pendiente(s) a ${h.daysToGoLive} d del go-live`);
+  return out;
+}
+
+/* ---------- Drawer ---------- */
+function openDrawer(id) {
+  state.openId = id;
+  $('drawer').classList.add('open');
+  $('drawer').setAttribute('aria-hidden', 'false');
+  renderDrawer();
+}
+function closeDrawer() {
+  state.openId = null;
+  $('drawer').classList.remove('open');
+  $('drawer').setAttribute('aria-hidden', 'true');
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+
+function renderDrawer() {
+  const p = state.projects.find((x) => x.id === state.openId);
+  if (!p) return closeDrawer();
+  const today = new Date().toISOString().slice(0, 10);
+  const report = $('sheet').querySelector('pre.report')?.outerHTML ?? '';
+  const phases = p.health.phases;
+  $('sheet').innerHTML = `
+    <button class="close" onclick="closeDrawer()" aria-label="Cerrar">✕</button>
+    <h2>${esc(p.clientName)}</h2>
+    <div style="margin:6px 0;color:var(--text-secondary)">${TYPE_LABEL[p.type]} · ${esc(p.owner ?? 'sin responsable')} · kickoff ${fmtDate(p.kickoffDate)} → go-live ${fmtDate(p.targetGoLive)}</div>
+    <div>${badge(p.health.health)} ${reasons(p).length ? `<span style="color:var(--text-secondary);font-size:12px"> ${esc(reasons(p).join(' · '))}</span>` : ''}</div>
+    <div class="meter"><span style="width:${p.health.percentComplete}%"></span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+      <select id="d-status" aria-label="Estado del proyecto">
+        ${[['active', 'Activo'], ['on-hold', 'En pausa'], ['live', 'En línea'], ['cancelled', 'Cancelado']].map(([k, l]) => `<option value="${k}" ${p.status === k ? 'selected' : ''}>${l}</option>`).join('')}
+      </select>
+      <input type="date" id="d-golive" value="${p.targetGoLive}" aria-label="Fecha de go-live" />
+      <button onclick="saveProject('${p.id}')">Guardar</button>
+      <select id="d-aud" aria-label="Audiencia"><option value="internal">Interno</option><option value="client">Cliente</option></select>
+      <button class="primary" onclick="report('${p.id}')">Reporte de estado (IA)</button>
+    </div>
+    ${report}
+
+    <h4>Checklist Turnkey</h4>
+    ${phases.map((ph) => `
+      <div style="margin-top:10px;font-weight:600;font-size:13px">${esc(phaseLabel(ph.key))} <span style="color:var(--text-muted);font-weight:400">${ph.done}/${ph.total}</span></div>
+      ${p.tasks.filter((t) => t.phase === ph.key).map((t) => `
+        <div class="task ${t.status === 'done' ? 'done' : ''}">
+          <input type="checkbox" ${t.status === 'done' ? 'checked' : ''} onchange="setTask('${p.id}','${t.id}', this.checked ? 'done' : 'todo')" aria-label="${esc(t.title)}" />
+          <div style="flex:1"><span class="t">${esc(t.title)}</span>
+            ${t.status === 'blocked' ? `<div class="blk">⚠ Bloqueada${t.blocker ? ': ' + esc(t.blocker) : ''}</div>` : ''}
+          </div>
+          <span class="due ${t.status !== 'done' && t.dueDate < today ? 'late' : ''}">${fmtDate(t.dueDate)}</span>
+          ${t.status !== 'done' ? (t.status === 'blocked'
+            ? `<button onclick="setTask('${p.id}','${t.id}','in-progress')">Desbloquear</button>`
+            : `<button onclick="blockTask('${p.id}','${t.id}')">Bloquear</button>`) : ''}
+        </div>`).join('')}`).join('')}
+
+    <h4>Integraciones</h4>
+    ${p.integrations.map((i) => `
+      <div class="integ">
+        <span class="n">${esc(i.name)} <span style="color:var(--text-muted);font-size:12px">${esc(i.kind)}</span></span>
+        <span class="sw s-${i.status}"></span>
+        <select onchange="setIntegration('${p.id}','${i.id}', this.value)" aria-label="Estado de ${esc(i.name)}">
+          ${INTEG.map(([k, l]) => `<option value="${k}" ${i.status === k ? 'selected' : ''}>${l}</option>`).join('')}
+        </select>
+      </div>`).join('') || '<div class="empty">Ninguna.</div>'}
+    <div style="display:flex;gap:6px;margin-top:6px">
+      <input id="d-int" placeholder="Nueva integración (ej. Shopify)" style="flex:1" />
+      <button onclick="addIntegration('${p.id}')">Agregar</button>
+    </div>
+
+    <h4>Bitácora</h4>
+    <div style="display:flex;gap:6px;margin-bottom:6px">
+      <input id="d-note" placeholder="Agregar nota…" style="flex:1" />
+      <button onclick="addNote('${p.id}')">Guardar</button>
+    </div>
+    <div class="log">${[...p.log].reverse().slice(0, 25).map((e) => `<div>${fmtDate(e.createdAt.slice(0, 10))} · ${esc(e.message)}</div>`).join('')}</div>`;
+}
+
+async function mutate(promise) {
+  try { await promise; } catch (e) { alert('Error: ' + e.message); }
+  await load();
+}
+const setTask = (pid, tid, status) => mutate(api(`/api/projects/${pid}/tasks/${tid}`, send('PATCH', { status })));
+function blockTask(pid, tid) {
+  const blocker = prompt('¿Qué la bloquea y quién debe actuar?');
+  if (blocker !== null) mutate(api(`/api/projects/${pid}/tasks/${tid}`, send('PATCH', { status: 'blocked', blocker: blocker || undefined })));
+}
+const setIntegration = (pid, iid, status) => mutate(api(`/api/projects/${pid}/integrations/${iid}`, send('PATCH', { status })));
+function addIntegration(pid) {
+  const name = $('d-int').value.trim();
+  if (name) mutate(api(`/api/projects/${pid}/integrations`, send('POST', { name })));
+}
+function addNote(pid) {
+  const message = $('d-note').value.trim();
+  if (message) mutate(api(`/api/projects/${pid}/log`, send('POST', { message })));
+}
+const saveProject = (pid) => mutate(api(`/api/projects/${pid}`, send('PATCH', { status: $('d-status').value, targetGoLive: $('d-golive').value })));
+
+async function report(pid) {
+  const old = $('sheet').querySelector('pre.report');
+  if (old) old.remove();
+  const pre = document.createElement('pre');
+  pre.className = 'report';
+  pre.textContent = 'Generando…';
+  $('sheet').querySelector('.meter').parentNode.insertBefore(pre, $('sheet').querySelector('h4'));
+  try {
+    const r = await api('/api/skills/pm-status-report', send('POST', { projectId: pid, audience: $('d-aud').value, language: 'es' }));
+    pre.textContent = r.report;
+  } catch (e) { pre.textContent = 'Error: ' + e.message; }
+}
+
+$('digestBtn').onclick = async () => {
+  $('digestPanel').hidden = false;
+  $('digest').textContent = 'Generando…';
+  $('digestPanel').scrollIntoView({ behavior: 'smooth' });
+  try { $('digest').textContent = (await api('/api/skills/pm-portfolio-digest', send('POST', { language: 'es' }))).digest; }
+  catch (e) { $('digest').textContent = 'Error: ' + e.message; }
+};
+
+/* ---------- Tooltip ---------- */
+function attachTip(el, html) {
+  const tip = $('tip');
+  el.addEventListener('mouseenter', () => { tip.innerHTML = html(); tip.style.display = 'block'; });
+  el.addEventListener('mousemove', (e) => {
+    const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+    tip.style.left = x + 'px';
+    tip.style.top = (e.clientY + 14) + 'px';
+  });
+  el.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+}
+
+['f-owner', 'f-type', 'f-health'].forEach((id) => $(id).addEventListener('change', render));
+$('f-q').addEventListener('input', render);
+
+load().catch((e) => { $('asOf').textContent = 'Error al cargar: ' + e.message; });
+// Skip auto-refresh while the drawer is open so in-progress edits aren't wiped.
+setInterval(() => { if (!document.hidden && !state.openId) load().catch(() => {}); }, 30000);
+</script>
+</body>
+</html>

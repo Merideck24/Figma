@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { contactsStore } from "../db.js";
+import { contactsStore, projectsStore } from "../db.js";
 import { draftWhatsappReply } from "../skills/whatsappAgent.js";
 import { generateAdCopy } from "../skills/claudeAds.js";
 import { generateComboCampaign } from "../skills/comboMarketing.js";
+import { analyzeIntake, generatePortfolioDigest, generateStatusReport } from "../skills/pmOpsAgent.js";
 
 export const skillsRouter = Router();
 
@@ -34,4 +35,26 @@ skillsRouter.post("/combo-campaign", async (req, res) => {
   }
   const result = await generateComboCampaign({ goal, audience, stageFilter });
   res.json(result);
+});
+
+skillsRouter.post("/pm-status-report", async (req, res) => {
+  const { projectId, audience = "internal", language = "es" } = req.body ?? {};
+  if (!projectId) return res.status(400).json({ error: "projectId is required" });
+  if (!["internal", "client"].includes(audience)) {
+    return res.status(400).json({ error: "audience must be internal or client" });
+  }
+  const project = projectsStore.get(projectId);
+  if (!project) return res.status(404).json({ error: "Project not found" });
+  res.json(await generateStatusReport({ project, audience, language }));
+});
+
+skillsRouter.post("/pm-portfolio-digest", async (req, res) => {
+  const { language = "es" } = req.body ?? {};
+  res.json(await generatePortfolioDigest(language));
+});
+
+skillsRouter.post("/pm-intake", async (req, res) => {
+  const { clientName, notes, language = "es" } = req.body ?? {};
+  if (!clientName || !notes) return res.status(400).json({ error: "clientName and notes are required" });
+  res.json({ brief: await analyzeIntake({ clientName, notes, language }) });
 });
